@@ -25,7 +25,9 @@ LOCAL_APPS = [
     'apps.candidates',
     'apps.scholar',
     'apps.course',
-    'apps.users'
+    'apps.users',
+    'apps.initial_training',
+    'apps.service_medical'
 ]
 
 THIRD_APPS = [

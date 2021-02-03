@@ -25,6 +25,8 @@ urlpatterns = [
     path('becarios/', include('apps.scholar.urls')),
     path('cursos/', include('apps.course.urls')),
     path('user/', include('apps.users.urls')),
+    path('formacion_inicial/', include('apps.initial_training.urls')),
+    path('servicio_medico/', include('apps.service_medical.urls')),
 
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='get_token'),
     path('token_refresh/', jwt_views.TokenRefreshView.as_view(), name='get_token_refresh'),
