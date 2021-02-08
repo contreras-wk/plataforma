@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import InitialTraining, AcademicPerformance
+
+admin.site.register(InitialTraining)
+admin.site.register(AcademicPerformance)
