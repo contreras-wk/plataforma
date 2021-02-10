@@ -12,6 +12,8 @@ SECRET_KEY = 'h**e##an%m=(%*5d+4*@xz33@rmcdrah1m3i0^s&ap6)2dx-6b'
 
 # Application definition
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 BASE_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -32,6 +34,7 @@ LOCAL_APPS = [
 
 THIRD_APPS = [
     'rest_framework',
+    'corsheaders',
 ]
 
 INSTALLED_APPS = BASE_APPS + LOCAL_APPS + THIRD_APPS
@@ -40,6 +43,7 @@ INSTALLED_APPS = BASE_APPS + LOCAL_APPS + THIRD_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

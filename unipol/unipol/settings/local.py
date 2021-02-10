@@ -15,16 +15,7 @@ DATABASES = {
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'drf_test',
-#         'HOST': '127.0.0.1',
-#         'USER': 'postgres',
-#         'PASSWORD': '1234',
-#         'PORT': 5432
-#     }
-# }
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/

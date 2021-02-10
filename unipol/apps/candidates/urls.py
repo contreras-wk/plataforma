@@ -6,8 +6,8 @@ from unipol.settings import local
 from .api import *
 
 urlpatterns = [
-    path('candidates/', CandidateLC.as_view(), name='candidates'),
-    path('candidate/<int:pk>/', CandidateRUD.as_view(), name='candidate'),
+    path('', CandidateLC.as_view(), name='candidates'),
+    path('<int:pk>/', CandidateRUD.as_view(), name='candidate'),
 
     path('document/', DocumentsC.as_view(), name='document'),
     path('document/<int:pk>/', DocumentsRU.as_view(), name='document'),

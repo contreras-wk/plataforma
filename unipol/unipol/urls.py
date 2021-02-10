@@ -21,13 +21,26 @@ from rest_framework_simplejwt import views as jwt_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('prebecarios/', include('apps.candidates.urls')),
-    path('becarios/', include('apps.scholar.urls')),
-    path('cursos/', include('apps.course.urls')),
-    path('user/', include('apps.users.urls')),
-    path('formacion_inicial/', include('apps.initial_training.urls')),
-    path('servicio_medico/', include('apps.service_medical.urls')),
+    path('api/v1.0/prebecarios/', include('apps.candidates.urls')),
+    path('api/v1.0/becarios/', include('apps.scholar.urls')),
+    path('api/v1.0/cursos/', include('apps.course.urls')),
+    path('api/v1.0/usuarios/', include('apps.users.urls')),
+    path('api/v1.0/formacion_inicial/', include('apps.initial_training.urls')),
+    path('api/v1.0/servicio_medico/', include('apps.service_medical.urls')),
 
     path('token/', jwt_views.TokenObtainPairView.as_view(), name='get_token'),
     path('token_refresh/', jwt_views.TokenRefreshView.as_view(), name='get_token_refresh'),
 ]
+
+"""
+---------------------------------------
+endponit            | app
+---------------------------------------
+prebecarios         | candidate
+becarios            | scholar
+cursos              | course
+usuarios            | users
+formacion_inicial   | initial_training 
+servicio_medico     | service_medical
+---------------------------------------
+"""
