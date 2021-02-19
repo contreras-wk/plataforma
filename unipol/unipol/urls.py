@@ -28,8 +28,8 @@ urlpatterns = [
     path('api/v1.0/formacion_inicial/', include('apps.initial_training.urls')),
     path('api/v1.0/servicio_medico/', include('apps.service_medical.urls')),
 
-    path('token/', jwt_views.TokenObtainPairView.as_view(), name='get_token'),
-    path('token_refresh/', jwt_views.TokenRefreshView.as_view(), name='get_token_refresh'),
+    path('api/v1.0/token/', jwt_views.TokenObtainPairView.as_view(), name='get_token'),
+    path('api/v1.0/refresh/', jwt_views.TokenRefreshView.as_view(), name='get_token_refresh'),
 ]
 
 """
