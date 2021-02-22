@@ -1,4 +1,5 @@
 import axios from 'axios'
+import store from '@/store'
 import jwtDefaultConfig from './jwtDefaultConfig'
 
 export default class JwtService {
@@ -25,7 +26,8 @@ export default class JwtService {
     this.axiosIns.interceptors.request.use(
       config => {
         // Get token from localStorage
-        const accessToken = this.getToken()
+        // const accessToken = this.getToken()
+        const accessToken = store.state.user.token
 
         // If token is present add it to request's Authorization Header
         if (accessToken) {
@@ -111,5 +113,9 @@ export default class JwtService {
     return this.axiosIns.post(this.jwtConfig.refreshEndpoint, {
       refreshToken: this.getRefreshToken(),
     })
+  }
+
+  getCandidates() {
+    return this.axiosIns.get(this.jwtConfig.getCandidates)
   }
 }
