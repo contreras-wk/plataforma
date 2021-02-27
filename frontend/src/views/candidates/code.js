@@ -252,1328 +252,584 @@ export default {
 </script>
 `
 
-export const codeColumnSearch = `
+export const codeIcon = `
 <template>
-  <div>
-    <!-- input search -->
-    <div class="custom-search d-flex justify-content-end">
-      <b-form-group>
-        <div class="d-flex align-items-center">
-          <label class="mr-1">Search</label>
-          <b-form-input
-            v-model="searchTerm"
-            placeholder="Search"
-            type="text"
-            class="d-inline-block"
-          />
-        </div>
-      </b-form-group>
-    </div>
-
-    <!-- table -->
-    <vue-good-table
-      :columns="columns"
-      :rows="rows"
-      :rtl="direction"
-      :search-options="{
-        enabled: true,
-        externalQuery: searchTerm }"
-      :pagination-options="{
-        enabled: true,
-        perPage:pageLength
-      }"
-    >
-      <template
-        slot="table-row"
-        slot-scope="props"
-      >
-
-        <!-- Column: Name -->
-        <div
-          v-if="props.column.field === 'fullName'"
-          class="text-nowrap"
-        >
-          <b-avatar
-            :src="props.row.avatar"
-            class="mx-1"
-          />
-          <span class="text-nowrap">{{ props.row.fullName }}</span>
-        </div>
-
-        <!-- Column: Status -->
-        <span v-else-if="props.column.field === 'status'">
-          <b-badge :variant="statusVariant(props.row.status)">
-            {{ props.row.status }}
-          </b-badge>
-        </span>
-
-        <!-- Column: Action -->
-        <span v-else-if="props.column.field === 'action'">
-          <span>
-            <b-dropdown
-              variant="link"
-              toggle-class="text-decoration-none"
-              no-caret
-            >
-              <template v-slot:button-content>
-                <feather-icon
-                  icon="MoreVerticalIcon"
-                  size="16"
-                  class="text-body align-middle mr-25"
-                />
-              </template>
-              <b-dropdown-item>
-                <feather-icon
-                  icon="Edit2Icon"
-                  class="mr-50"
-                />
-                <span>Edit</span>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <feather-icon
-                  icon="TrashIcon"
-                  class="mr-50"
-                />
-                <span>Delete</span>
-              </b-dropdown-item>
-            </b-dropdown>
-          </span>
-        </span>
-
-        <!-- Column: Common -->
-        <span v-else>
-          {{ props.formattedRow[props.column.field] }}
-        </span>
-      </template>
-
-      <!-- pagination -->
-      <template
-        slot="pagination-bottom"
-        slot-scope="props"
-      >
-        <div class="d-flex justify-content-between flex-wrap">
-          <div class="d-flex align-items-center mb-0 mt-1">
-            <span class="text-nowrap">
-              Showing 1 to
-            </span>
-            <b-form-select
-              v-model="pageLength"
-              :options="['3','5','10']"
-              class="mx-1"
-              @input="(value)=>props.perPageChanged({currentPerPage:value})"
-            />
-            <span class="text-nowrap "> of {{ props.total }} entries </span>
-          </div>
-          <div>
-            <b-pagination
-              :value="1"
-              :total-rows="props.total"
-              :per-page="pageLength"
-              first-number
-              last-number
-              align="right"
-              prev-class="prev-item"
-              next-class="next-item"
-              class="mt-1 mb-0"
-              @input="(value)=>props.pageChanged({currentPage:value})"
-            >
-              <template #prev-text>
-                <feather-icon
-                  icon="ChevronLeftIcon"
-                  size="18"
-                />
-              </template>
-              <template #next-text>
-                <feather-icon
-                  icon="ChevronRightIcon"
-                  size="18"
-                />
-              </template>
-            </b-pagination>
-          </div>
-        </div>
-      </template>
-    </vue-good-table>
-  </div>
-</template>
-
-<script>
-import {
-  BAvatar, BBadge, BPagination, BFormGroup, BFormInput, BFormSelect, BDropdown, BDropdownItem,
-} from 'bootstrap-vue'
-import { VueGoodTable } from 'vue-good-table'
-import store from '@/store/index'
-
-export default {
-  components: {
-    VueGoodTable,
-    BAvatar,
-    BBadge,
-    BPagination,
-    BFormGroup,
-    BFormInput,
-    BFormSelect,
-    BDropdown,
-    BDropdownItem,
-  },
-  data() {
-    return {
-      pageLength: 3,
-      dir: false,
-      columns: [
-        {
-          label: 'Name',
-          field: 'fullName',
-          filterOptions: {
-            enabled: true,
-            placeholder: 'Search Name',
-          },
-        },
-        {
-          label: 'Email',
-          field: 'email',
-          filterOptions: {
-            enabled: true,
-            placeholder: 'Search Email',
-          },
-        },
-        {
-          label: 'Date',
-          field: 'startDate',
-          filterOptions: {
-            enabled: true,
-            placeholder: 'Search Date',
-          },
-        },
-        {
-          label: 'Salary',
-          field: 'salary',
-          filterOptions: {
-            enabled: true,
-            placeholder: 'Search Salary',
-          },
-        },
-        {
-          label: 'Status',
-          field: 'status',
-          filterOptions: {
-            enabled: true,
-            placeholder: 'Search Status',
-          },
-        },
-        {
-          label: 'Action',
-          field: 'action',
-        },
-      ],
-      rows: [],
-      searchTerm: '',
-    }
-  },
-  computed: {
-    statusVariant() {
-      const statusColor = {
-        /* eslint-disable key-spacing */
-        Current      : 'light-primary',
-        Professional : 'light-success',
-        Rejected     : 'light-danger',
-        Resigned     : 'light-warning',
-        Applied      : 'light-info',
-        /* eslint-enable key-spacing */
-      }
-
-      return status => statusColor[status]
-    },
-    direction() {
-      if (store.state.appConfig.isRTL) {
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.dir = true
-        return this.dir
-      }
-      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      this.dir = false
-      return this.dir
-    },
-  },
-  created() {
-    this.$http.get('/good-table/basic')
-      .then(res => { this.rows = res.data })
-  },
-}
-</script>
-`
-
-export const codeRowGroup = `
-<template>
-  <div>
-    <!-- search input -->
-    <div class="custom-search d-flex justify-content-end">
-      <b-form-group>
-        <div class="d-flex align-items-center">
-          <label class="mr-1">Search</label>
-          <b-form-input
-            v-model="searchTerm"
-            placeholder="Search"
-            type="text"
-            class="d-inline-block"
-          />
-        </div>
-      </b-form-group>
-    </div>
-
-    <!-- table -->
-    <vue-good-table
-      :columns="columns"
-      :rows="rows"
-      :rtl="direction"
-      :search-options="{
-        enabled: true,
-        externalQuery: searchTerm }"
-      :select-options="{
-        enabled: true,
-        selectOnCheckboxOnly: true, // only select when checkbox is clicked instead of the row
-        selectionInfoClass: 'custom-class',
-        selectionText: 'rows selected',
-        clearSelectionText: 'clear',
-        disableSelectInfo: true, // disable the select info panel on top
-        selectAllByGroup: false, // when used in combination with a grouped table, add a checkbox in the header row to check/uncheck the entire group
-      }"
-      :pagination-options="{
-        enabled: true,
-        perPage:pageLength
-      }"
-      :group-options="{
-        enabled: true
-      }"
-    >
-      <template
-        slot="table-row"
-        slot-scope="props"
-      >
-
-        <!-- Column: Name -->
-        <span
-          v-if="props.column.field === 'fullName'"
-          class="text-nowrap"
-        >
-          <b-avatar
-            :src="props.row.avatar"
-            class="mx-1"
-          />
-          <span class="text-nowrap">{{ props.row.fullName }}</span>
-        </span>
-
-        <!-- Column: Status -->
-        <span v-else-if="props.column.field === 'status'">
-          <b-badge :variant="statusVariant(props.row.status)">
-            {{ props.row.status }}
-          </b-badge>
-        </span>
-
-        <!-- Column: Action -->
-        <span v-else-if="props.column.field === 'action'">
-          <span>
-            <b-dropdown
-              variant="link"
-              toggle-class="text-decoration-none"
-              no-caret
-            >
-              <template v-slot:button-content>
-                <feather-icon
-                  icon="MoreVerticalIcon"
-                  size="16"
-                  class="text-body align-middle mr-25"
-                />
-              </template>
-              <b-dropdown-item>
-                <feather-icon
-                  icon="Edit2Icon"
-                  class="mr-50"
-                />
-                <span>Edit</span>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <feather-icon
-                  icon="TrashIcon"
-                  class="mr-50"
-                />
-                <span>Delete</span>
-              </b-dropdown-item>
-            </b-dropdown>
-          </span>
-        </span>
-
-        <!-- Column: Common -->
-        <span v-else>
-          {{ props.formattedRow[props.column.field] }}
-        </span>
-      </template>
-      <!-- pagination -->
-      <template
-        slot="pagination-bottom"
-        slot-scope="props"
-      >
-        <div class="d-flex justify-content-between flex-wrap">
-          <div class="d-flex align-items-center mb-0 mt-1">
-            <span class="text-nowrap">
-              Showing 1 to
-            </span>
-            <b-form-select
-              v-model="pageLength"
-              :options="['3','5','10']"
-              class="mx-1"
-              @input="(value)=>props.perPageChanged({currentPerPage:value})"
-            />
-            <span class="text-nowrap"> of {{ props.total }} entries </span>
-          </div>
-          <div>
-            <b-pagination
-              :value="1"
-              :total-rows="props.total"
-              :per-page="pageLength"
-              first-number
-              last-number
-              align="right"
-              prev-class="prev-item"
-              next-class="next-item"
-              class="mt-1 mb-0"
-              @input="(value)=>props.pageChanged({currentPage:value})"
-            >
-              <template #prev-text>
-                <feather-icon
-                  icon="ChevronLeftIcon"
-                  size="18"
-                />
-              </template>
-              <template #next-text>
-                <feather-icon
-                  icon="ChevronRightIcon"
-                  size="18"
-                />
-              </template>
-            </b-pagination>
-          </div>
-        </div>
-      </template>
-    </vue-good-table>
-  </div>
-</template>
-
-<script>
-import {
-  BAvatar, BBadge, BPagination, BFormGroup, BFormInput, BFormSelect, BDropdownItem, BDropdown,
-} from 'bootstrap-vue'
-import { VueGoodTable } from 'vue-good-table'
-import store from '@/store/index'
-
-export default {
-  components: {
-    VueGoodTable,
-    BAvatar,
-    BBadge,
-    BPagination,
-    BFormGroup,
-    BFormInput,
-    BFormSelect,
-    BDropdownItem,
-    BDropdown,
-  },
-  data() {
-    return {
-      pageLength: 5,
-      dir: false,
-      columns: [
-        {
-          label: 'Name',
-          field: 'fullName',
-        },
-        {
-          label: 'Email',
-          field: 'email',
-        },
-        {
-          label: 'Date',
-          field: 'startDate',
-        },
-        {
-          label: 'Salary',
-          field: 'salary',
-        },
-        {
-          label: 'Status',
-          field: 'status',
-        },
-        {
-          label: 'Action',
-          field: 'action',
-        },
-      ],
-      rows: [],
-      searchTerm: '',
-    }
-  },
-  computed: {
-    statusVariant() {
-      const statusColor = {
-        /* eslint-disable key-spacing */
-        Current      : 'light-primary',
-        Professional : 'light-success',
-        Rejected     : 'light-danger',
-        Resigned     : 'light-warning',
-        Applied      : 'light-info',
-        /* eslint-enable key-spacing */
-      }
-
-      return status => statusColor[status]
-    },
-    direction() {
-      if (store.state.appConfig.isRTL) {
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.dir = true
-        return this.dir
-      }
-      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      this.dir = false
-      return this.dir
-    },
-  },
-  created() {
-    this.$http.get('/good-table/row-group')
-      .then(res => { this.rows = res.data })
-  },
-}
-</script>
-`
-
-export const codeAdvance = `
-<template>
-  <div>
-    <div class="custom-search">
-
-      <!-- advance search input -->
+  <form-wizard
+    color="#5A8DEE"
+    :title="null"
+    :subtitle="null"
+    finish-button-text="Submit"
+    @on-complete="formSubmitted"
+  >
+    <tab-content icon="bx bx-file-blank">
       <b-row>
-        <b-col md="4">
+        <b-col cols="12">
+          <h6 class="py-50">
+            Enter Your Personal Details
+          </h6>
+        </b-col>
+        <b-col md="6">
           <b-form-group>
-            <label>Name:</label>
+            <label for="firstName">First Name</label>
             <b-form-input
-              placeholder="Search"
+              id="firstName"
               type="text"
-              class="d-inline-block"
-              @input="advanceSearch"
+              placeholder="Enter Your First Name"
             />
           </b-form-group>
         </b-col>
-        <b-col md="4">
+        <b-col md="6">
           <b-form-group>
-            <label>Email:</label>
+            <label for="lastName">Last Name</label>
             <b-form-input
-              placeholder="Search"
+              id="lastName"
               type="text"
-              class="d-inline-block"
-              @input="advanceSearch"
+              placeholder="Enter Your Last Name"
             />
           </b-form-group>
         </b-col>
-        <b-col md="4">
+        <b-col md="6">
           <b-form-group>
-            <label>Post:</label>
+            <label for="email">Email</label>
             <b-form-input
-              placeholder="Search"
-              type="text"
-              class="d-inline-block"
-              @input="advanceSearch"
+              id="email"
+              type="email"
+              placeholder="Enter Your Email"
             />
           </b-form-group>
         </b-col>
-        <b-col md="4">
+        <b-col md="6">
           <b-form-group>
-            <label>City:</label>
+            <label for="phone">Phone</label>
             <b-form-input
-              placeholder="Search"
-              type="text"
-              class="d-inline-block"
-              @input="advanceSearch"
+              id="phone"
+              type="number"
+              placeholder="Enter Your Phone Number"
             />
           </b-form-group>
         </b-col>
-        <b-col md="4">
+        <b-col md="6">
           <b-form-group>
-            <label>Date:</label>
+            <label for="age">Age</label>
             <b-form-input
-              placeholder="Search"
-              type="text"
-              class="d-inline-block"
-              @input="advanceSearch"
+              id="age"
+              type="number"
+              placeholder="Enter Your Age"
             />
           </b-form-group>
         </b-col>
-        <b-col md="4">
+        <b-col md="6">
           <b-form-group>
-            <label>Salary:</label>
-            <b-form-input
-              placeholder="Search"
-              type="text"
-              class="d-inline-block"
-              @input="advanceSearch"
-            />
+            <label>Gender</label>
+            <div class="radio">
+              <b-form-radio
+                v-model="gender"
+                class="p-0"
+                name="some-radios"
+                value="A"
+                plain
+                inline
+              >
+                Male
+              </b-form-radio>
+              <b-form-radio
+                v-model="gender"
+                name="some-radios"
+                value="B"
+                plain
+                inline
+              >
+                Female
+              </b-form-radio>
+            </div>
           </b-form-group>
         </b-col>
       </b-row>
-    </div>
-
-    <!-- table -->
-    <vue-good-table
-      :columns="columns"
-      :rows="rows"
-      :rtl="direction"
-      :search-options="{
-        enabled: true,
-        externalQuery: searchTerm }"
-      :select-options="{
-        enabled: true,
-        selectOnCheckboxOnly: true, // only select when checkbox is clicked instead of the row
-        selectionInfoClass: 'custom-class',
-        selectionText: 'rows selected',
-        clearSelectionText: 'clear',
-        disableSelectInfo: true, // disable the select info panel on top
-        selectAllByGroup: true, // when used in combination with a grouped table, add a checkbox in the header row to check/uncheck the entire group
-      }"
-      :pagination-options="{
-        enabled: true,
-        perPage:pageLength
-      }"
-      theme="my-theme"
-      @on-row-click="onRowClick"
-    >
-      <template
-        slot="table-row"
-        slot-scope="props"
-      >
-        <span
-          v-if="props.column.field === 'fullName'"
-          class="text-nowrap"
-        >
-          <b-avatar
-            :src="props.row.avatar"
-            class="mx-1"
-          />
-          <span>{{ props.row.fullName }}</span>
-        </span>
-        <span v-else>
-          {{ props.formattedRow[props.column.field] }}
-        </span>
-      </template>
-
-      <!-- pagination -->
-      <template
-        slot="pagination-bottom"
-        slot-scope="props"
-      >
-        <div class="d-flex justify-content-between flex-wrap">
-          <div class="d-flex align-items-center mb-0 mt-1">
-            <span class="text-nowrap">
-              Showing 1 to
-            </span>
-            <b-form-select
-              v-model="pageLength"
-              :options="['3','5','10']"
-              class="mx-1"
-              @input="(value)=>props.perPageChanged({currentPerPage:value})"
+    </tab-content>
+    <tab-content icon="bx bxs-truck">
+      <b-row>
+        <b-col cols="12">
+          <h6 class="py-50">
+            Enter Your Location
+          </h6>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label for="AddresLine1">Address Line 1</label>
+            <b-form-input
+              id="AddresLine1"
+              type="text"
+              placeholder="Enter House no./ Flate no."
             />
-            <span class="text-nowrap"> of {{ props.total }} entries </span>
-          </div>
-          <div>
-            <b-pagination
-              :value="1"
-              :total-rows="props.total"
-              :per-page="pageLength"
-              first-number
-              last-number
-              align="right"
-              prev-class="prev-item"
-              next-class="next-item"
-              class="mt-1 mb-0"
-              @input="(value)=>props.pageChanged({currentPage:value})"
-            >
-              <template #prev-text>
-                <feather-icon
-                  icon="ChevronLeftIcon"
-                  size="18"
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label for="AddresLine2">Address Line 2</label>
+            <b-form-input
+              id="AddresLine2"
+              type="text"
+              placeholder="Enter Society name/ Area name"
+            />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label for="landmark">Landmark</label>
+            <b-form-input
+              id="landmark"
+              type="text"
+              placeholder="Enter A Landmark"
+            />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label for="town-city">Town/City</label>
+            <b-form-input
+              id="town-city"
+              type="text"
+              placeholder="Enter Town/City"
+            />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label for="pincode">Pincode</label>
+            <b-form-input
+              id="pincode"
+              type="number"
+              placeholder="Enter Your Pincode"
+            />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label for="state">State</label>
+            <b-form-input
+              id="state"
+              type="text"
+              placeholder="Enter Your State"
+            />
+          </b-form-group>
+        </b-col>
+        <b-col md="6">
+          <b-form-group>
+            <label for="country">Country</label>
+            <b-form-select
+              v-model="selected"
+              :options="options"
+            />
+          </b-form-group>
+        </b-col>
+        <b-col
+          md="6"
+          class="d-flex align-items-center"
+        >
+          <b-form-group>
+            <div class="checkbox">
+              <b-form-checkbox
+                plain
+                value="A"
+                class="ml-0"
+              >
+                Permanent Delivery address
+              </b-form-checkbox>
+            </div>
+          </b-form-group>
+        </b-col>
+      </b-row>
+    </tab-content>
+    <tab-content icon="bx bx-home">
+      <b-row>
+        <b-col cols="12">
+          <h6 class="py-50">
+            Enter Your Payment Methods
+          </h6>
+        </b-col>
+        <b-col cols="12">
+          <b-form-group>
+            <div class="d-flex justify-content-between flex-wrap align-items-center">
+              <div class="vs-radio-con vs-radio-primary">
+                <b-img
+                  :src="require('@/assets/images/images/pages/bank.png')"
+                  height="40"
+                  class="d-inline-block"
                 />
-              </template>
-              <template #next-text>
-                <feather-icon
-                  icon="ChevronRightIcon"
-                  size="18"
+                <span>Card 12XX XXXX XXXX 0000</span>
+              </div>
+              <div class="card-holder-name">
+                John Doe
+              </div>
+              <div class="card-expiration-date">
+                11/2020
+              </div>
+              <div>
+                <label>Enter CVV</label>
+                <b-form-input
+                  type="password"
+                  placeholder="Enter Your CVV no."
                 />
-              </template>
-            </b-pagination>
+              </div>
+            </div>
+          </b-form-group>
+          <hr>
+        </b-col>
+        <b-col cols="12 pl-0">
+          <b-form-group>
+            <div class="radio">
+              <b-form-radio-group
+                :options="radioOption"
+                name="radios-stacked"
+                plain
+                stacked
+              />
+            </div>
+          </b-form-group>
+          <hr class="ml-1">
+        </b-col>
+        <b-col
+          cols="12"
+          class="d-flex align-items-center"
+        >
+          <div class="paypal cursor-pointer d-flex align-items-center">
+            <div class="radio">
+              <b-form-radio
+                class="p-0"
+                name="some-radios"
+                value="A"
+                plain
+              >
+                <b-img
+                  :src="require('@/assets/images/images/pages/PayPal_logo.png')"
+                  alt="PayPal Logo"
+                />
+              </b-form-radio>
+            </div>
           </div>
-        </div>
-      </template>
-    </vue-good-table>
-  </div>
+          <div class="googlepay cursor-pointer pl-1 d-flex align-items-center">
+            <div class="radio">
+              <b-form-radio
+                class="p-0"
+                name="some-radios"
+                value="B"
+                plain
+              >
+                <b-img
+                  :src="require('@/assets/images/images/pages/google-pay.png')"
+                  height="30"
+                  alt="google Logo"
+                />
+              </b-form-radio>
+            </div>
+          </div>
+        </b-col>
+        <b-col md="6">
+          <hr>
+
+          <label>Enter Your Promocode</label>
+          <b-form-input
+            type="text"
+            placeholder="Enter Your Promocode"
+          />
+        </b-col>
+      </b-row>
+    </tab-content>
+  </form-wizard>
 </template>
 
 <script>
+import AppCard from '@core/components/app-card/AppCard.vue'
+import { FormWizard, TabContent } from 'vue-form-wizard'
+import 'vue-form-wizard/dist/vue-form-wizard.min.css'
 import {
-  BAvatar, BPagination, BFormGroup, BFormInput, BFormSelect, BRow, BCol,
+  BRow,
+  BCol,
+  BFormGroup,
+  BFormInput,
+  BFormRadio,
+  BFormCheckbox,
+  BFormSelect,
+  BImg,
+  BFormRadioGroup,
 } from 'bootstrap-vue'
-import ToastificationContent from '@core/components/toastification/ToastificationContent.vue'
-import { VueGoodTable } from 'vue-good-table'
-import store from '@/store/index'
 
 export default {
   components: {
-    VueGoodTable,
-    BAvatar,
-    BPagination,
-    BFormGroup,
-    BFormInput,
-    BFormSelect,
+    FormWizard,
+    TabContent,
+    AppCard,
     BRow,
     BCol,
-    // eslint-disable-next-line vue/no-unused-components
-    ToastificationContent,
+    BFormGroup,
+    BFormInput,
+    BFormRadio,
+    BFormCheckbox,
+    BFormSelect,
+    BImg,
+    BFormRadioGroup,
   },
-  data() {
-    return {
-      pageLength: 5,
-      dir: false,
-      columns: [
-        {
-          label: 'Name',
-          field: 'fullName',
-        },
-        {
-          label: 'Email',
-          field: 'email',
-        },
-        {
-          label: 'Post',
-          field: 'post',
-        },
-        {
-          label: 'City',
-          field: 'city',
-        },
-        {
-          label: 'Date',
-          field: 'startDate',
-        },
-        {
-          label: 'Salary',
-          field: 'salary',
-        },
-      ],
-      rows: [],
-      searchTerm: '',
-    }
-  },
-  computed: {
-    direction() {
-      if (store.state.appConfig.isRTL) {
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.dir = true
-        return this.dir
-      }
-      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      this.dir = false
-      return this.dir
-    },
-  },
-  created() {
-    this.$http.get('/good-table/advanced-search')
-      .then(res => { this.rows = res.data })
-  },
+  data: () => ({
+    selected: null,
+    gender: 'A',
+    options: [
+      { value: null, text: 'Please select an option' },
+      { value: 'a', text: 'This is First option' },
+      { value: 'b', text: 'Selected Option' },
+      { value: { C: '3PO' }, text: 'This is an option with object value' },
+      { value: 'd', text: 'This one is disabled', disabled: true },
+    ],
+    radioOption: [
+      { text: 'Credit / Debit / ATM Card', value: 'first' },
+      { text: 'Net Banking', value: 'second' },
+      { text: 'EMI (Easy Installment)', value: 'third' },
+      { text: 'Cash On Delivery', value: 'fourth' },
+    ],
+    radioOption2: [
+      { text: '', value: 'paypal' },
+      { text: '', value: 'gpay' },
+    ],
+  }),
   methods: {
-    advanceSearch(val) {
-      this.searchTerm = val
-    },
-    onRowClick(params) {
-      this.$toast({
-        component: ToastificationContent,
-        props: {
-          title: \`Hello user! You have clicked on row \${params.row.id}\`,
-          icon: 'UserIcon',
-          variant: 'success',
-        },
-      })
+    formSubmitted() {
+      // eslint-disable-next-line
+      alert('Form submitted!')
     },
   },
 }
 </script>
 `
 
-export const codeI18n = `
+export const codeLimiting = `
 <template>
   <div>
-    <!-- search input -->
-    <div class="custom-search d-flex justify-content-end">
-      <b-form-group>
-        <div class="d-flex align-items-center">
-          <label class="mr-1">{{ $t('message.seachLabel') }}</label>
-          <b-form-input
-            v-model="searchTerm"
-            :placeholder=" $t('message.SearchPlaceholder')"
-            type="text"
-            class="d-inline-block"
-          />
-        </div>
-      </b-form-group>
+    <div>
+      <!-- Accept all image formats by IANA media type wildcard-->
+      <label for="wildcard">Accept all image</label>
+      <b-form-file
+        id="wildcard"
+        accept="image/*"
+      />
+
+      <!-- Accept specific image formats by IANA type -->
+      <label
+        for="IANA"
+        class="mt-1"
+      >Accept specific image formats by IANA type</label>
+      <b-form-file
+        id="IANA"
+        accept="image/jpeg, image/png, image/gif"
+      />
+
+      <!-- Accept specific image formats by extension -->
+      <label
+        for="extension"
+        class="mt-1"
+      >Accept specific image formats by extension</label>
+      <b-form-file
+        id="extension"
+        accept=".jpg, .png, .gif"
+      />
     </div>
-
-    <!-- table -->
-    <vue-good-table
-      :columns="columns"
-      :rows="rows"
-      :rtl="direction"
-      :search-options="{
-        enabled: true,
-        externalQuery: searchTerm }"
-      :select-options="{
-        enabled: true,
-        selectOnCheckboxOnly: true, // only select when checkbox is clicked instead of the row
-        selectionInfoClass: 'custom-class',
-        selectionText: 'rows selected',
-        clearSelectionText: 'clear',
-        disableSelectInfo: true, // disable the select info panel on top
-        selectAllByGroup: true, // when used in combination with a grouped table, add a checkbox in the header row to check/uncheck the entire group
-      }"
-      :pagination-options="{
-        enabled: true,
-        perPage:pageLength
-      }"
-    >
-
-      <!-- Slot: Table Column -->
-      <template
-        slot="table-column"
-        slot-scope="props"
-      >
-        <span
-          v-if="props.column.label ==='Name'"
-          class="text-nowrap"
-        >
-          {{ $t('message.tableHeader.name') }}
-        </span>
-        <span
-          v-else-if="props.column.label ==='Email'"
-          class="text-nowrap"
-        >
-          {{ $t('message.tableHeader.email') }}
-        </span>
-        <span
-          v-else-if="props.column.label ==='Date'"
-          class="text-nowrap"
-        >
-          {{ $t('message.tableHeader.date') }}
-        </span>
-        <span
-          v-else-if="props.column.label ==='Salary'"
-          class="text-nowrap"
-        >
-          {{ $t('message.tableHeader.salary') }}
-        </span>
-        <span
-          v-else-if="props.column.label ==='Status'"
-          class="text-nowrap"
-        >
-          {{ $t('message.tableHeader.status') }}
-        </span>
-        <span
-          v-else-if="props.column.label ==='Action'"
-          class="text-nowrap"
-        >
-          {{ $t('message.tableHeader.action') }}
-        </span>
-        <span v-else>
-          {{ props.column.label }}
-        </span>
-      </template>
-
-      <!-- Slot: Table Row -->
-      <template
-        slot="table-row"
-        slot-scope="props"
-      >
-
-        <!-- Column: Name -->
-        <span
-          v-if="props.column.field === 'fullName'"
-          class="text-nowrap"
-        >
-          <b-avatar
-            :src="props.row.avatar"
-            class="mx-1"
-          />
-          <span>{{ props.row.fullName }}</span>
-        </span>
-
-        <!-- Column: Status -->
-        <span v-else-if="props.column.field === 'status'">
-          <b-badge :variant="statusVariant(props.row.status)">
-            {{ props.row.status }}
-          </b-badge>
-        </span>
-
-        <!-- Column: Action -->
-        <span v-else-if="props.column.field === 'action'">
-          <span>
-            <b-dropdown
-              variant="link"
-              toggle-class="text-decoration-none"
-              no-caret
-            >
-              <template v-slot:button-content>
-                <feather-icon
-                  icon="MoreVerticalIcon"
-                  size="16"
-                  class="text-body align-middle mr-25"
-                />
-              </template>
-              <b-dropdown-item>
-                <feather-icon
-                  icon="Edit2Icon"
-                  class="mr-50"
-                />
-                <span>Edit</span>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <feather-icon
-                  icon="TrashIcon"
-                  class="mr-50"
-                />
-                <span>Delete</span>
-              </b-dropdown-item>
-            </b-dropdown>
-          </span>
-        </span>
-
-        <!-- Column: Common -->
-        <span v-else>
-          {{ props.formattedRow[props.column.field] }}
-        </span>
-      </template>
-
-      <!-- pagination -->
-      <template
-        slot="pagination-bottom"
-        slot-scope="props"
-      >
-        <div class="d-flex justify-content-between flex-wrap">
-          <div class="d-flex align-items-center mb-0 mt-1">
-            <span class="text-nowrap">
-              {{ $t('message.pagelength') }}
-            </span>
-            <b-form-select
-              v-model="pageLength"
-              :options="['3','5','10']"
-              class="mx-1"
-              @input="(value)=>props.perPageChanged({currentPerPage:value})"
-            />
-            <span class="text-nowrap">  {{ $t('message.of') }} {{ props.total }} {{ $t('message.pageText2') }} </span>
-          </div>
-          <div>
-            <b-pagination
-              :value="1"
-              :total-rows="props.total"
-              :per-page="pageLength"
-              first-number
-              last-number
-              align="right"
-              prev-class="prev-item"
-              next-class="next-item"
-              class="mt-1 mb-0"
-              @input="(value)=>props.pageChanged({currentPage:value})"
-            >
-              <template #prev-text>
-                <feather-icon
-                  icon="ChevronLeftIcon"
-                  size="18"
-                />
-              </template>
-              <template #next-text>
-                <feather-icon
-                  icon="ChevronRightIcon"
-                  size="18"
-                />
-              </template>
-            </b-pagination>
-          </div>
-        </div>
-      </template>
-    </vue-good-table>
   </div>
 </template>
 
 <script>
-import {
-  BAvatar, BBadge, BPagination, BFormGroup, BFormInput, BFormSelect, BAlert, BDropdown, BDropdownItem,
-} from 'bootstrap-vue'
-import { VueGoodTable } from 'vue-good-table'
-import store from '@/store/index'
-
-export default {
-  components: {
-    VueGoodTable,
-    BAvatar,
-    BBadge,
-    BPagination,
-    BFormGroup,
-    BFormInput,
-    BFormSelect,
-    BAlert,
-    BDropdown,
-    BDropdownItem,
-  },
-  data() {
-    return {
-      pageLength: 5,
-      dir: false,
-      columns: [
-        {
-          label: 'Name',
-          field: 'fullName',
-        },
-        {
-          label: 'Email',
-          field: 'email',
-        },
-        {
-          label: 'Date',
-          field: 'startDate',
-        },
-        {
-          label: 'Salary',
-          field: 'salary',
-        },
-        {
-          label: 'Status',
-          field: 'status',
-        },
-        {
-          label: 'Action',
-          field: 'action',
-        },
-      ],
-      rows: [],
-      searchTerm: '',
-
-    }
-  },
-  computed: {
-    statusVariant() {
-      const statusColor = {
-        /* eslint-disable key-spacing */
-        Current      : 'light-primary',
-        Professional : 'light-success',
-        Rejected     : 'light-danger',
-        Resigned     : 'light-warning',
-        Applied      : 'light-info',
-        /* eslint-enable key-spacing */
-      }
-
-      return status => statusColor[status]
-    },
-    direction() {
-      if (store.state.appConfig.isRTL) {
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.dir = true
-        return this.dir
-      }
-      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      this.dir = false
-      return this.dir
-    },
-  },
-  created() {
-    this.$http.get('/good-table/basic')
-      .then(res => { this.rows = res.data })
-  },
-}
-</script>
-`
-
-export const codeSSR = `
-<template>
-  <b-card-code title="SSR">
-
-    <!-- search input -->
-    <div class="custom-search d-flex justify-content-end">
-      <b-form-group>
-        <div class="d-flex align-items-center">
-          <label class="mr-1">Search</label>
-          <b-form-input
-            v-model="searchTerm"
-            placeholder="Search"
-            type="text"
-            class="d-inline-block"
-            @input="handleSearch"
-          />
-        </div>
-      </b-form-group>
-    </div>
-
-    <!-- table -->
-    <vue-good-table
-      mode="remote"
-      :columns="columns"
-      :rows="rows"
-      :rtl="direction"
-      :search-options="{
-        enabled: true,
-        externalQuery: searchTerm
-      }"
-      :select-options="{
-        enabled: true,
-        selectOnCheckboxOnly: true,
-        selectionInfoClass: 'custom-class',
-        selectionText: 'rows selected',
-        clearSelectionText: 'clear',
-        disableSelectInfo: true,
-        selectAllByGroup: true,
-      }"
-      :pagination-options="{
-        enabled: true,
-      }"
-      @on-sort-change="onSortChange"
-    >
-      <template
-        slot="table-row"
-        slot-scope="props"
-      >
-
-        <!-- Column: Name -->
-        <span
-          v-if="props.column.field === 'fullName'"
-          class="text-nowrap"
-        >
-          <b-avatar
-            :src="props.row.avatar"
-            class="mx-1"
-          />
-          <span class="text-nowrap">{{ props.row.fullName }}</span>
-        </span>
-
-        <!-- Column: Status -->
-        <span v-else-if="props.column.field === 'status'">
-          <b-badge :variant="statusVariant(props.row.status)">
-            {{ props.row.status }}
-          </b-badge>
-        </span>
-
-        <!-- Column: Action -->
-        <span v-else-if="props.column.field === 'action'">
-          <span>
-            <b-dropdown
-              variant="link"
-              toggle-class="text-decoration-none"
-              no-caret
-            >
-              <template v-slot:button-content>
-                <feather-icon
-                  icon="MoreVerticalIcon"
-                  size="16"
-                  class="text-body align-middle mr-25"
-                />
-              </template>
-              <b-dropdown-item>
-                <feather-icon
-                  icon="Edit2Icon"
-                  class="mr-50"
-                />
-                <span>Edit</span>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <feather-icon
-                  icon="TrashIcon"
-                  class="mr-50"
-                />
-                <span>Delete</span>
-              </b-dropdown-item>
-            </b-dropdown>
-          </span>
-        </span>
-
-        <!-- Column: Common -->
-        <span v-else>
-          {{ props.formattedRow[props.column.field] }}
-        </span>
-      </template>
-
-      <!-- pagination -->
-      <template
-        slot="pagination-bottom"
-        slot-scope="props"
-      >
-        <div class="d-flex justify-content-between flex-wrap">
-
-          <!-- page length -->
-          <div class="d-flex align-items-center mb-0 mt-1">
-            <span class="text-nowrap ">
-              Showing 1 to
-            </span>
-            <b-form-select
-              v-model="pageLength"
-              :options="pages"
-              class="mx-1"
-              @input="handlePageChange"
-            />
-            <span class="text-nowrap"> of {{ props.total }} entries </span>
-          </div>
-
-          <!-- pagination -->
-          <div>
-            <b-pagination
-              :value="1"
-              :total-rows="props.total"
-              :per-page="pageLength"
-              first-number
-              last-number
-              align="right"
-              prev-class="prev-item"
-              next-class="next-item"
-              class="mt-1 mb-0"
-              @change="handleChangePage"
-            >
-              <template #prev-text>
-                <feather-icon
-                  icon="ChevronLeftIcon"
-                  size="18"
-                />
-              </template>
-              <template #next-text>
-                <feather-icon
-                  icon="ChevronRightIcon"
-                  size="18"
-                />
-              </template>
-            </b-pagination>
-          </div>
-        </div>
-      </template>
-    </vue-good-table>
-
-    <prism class="rounded mt-1">
-      {{ log.join("\n") }}
-    </prism>
-
-    <template #code>
-      {{ codeBasic }}
-    </template>
-  </b-card-code>
-</template>
-
-<script>
-import {
-  BAvatar, BBadge, BPagination, BFormGroup, BFormInput, BFormSelect, BDropdownItem, BDropdown,
-} from 'bootstrap-vue'
-import { VueGoodTable } from 'vue-good-table'
-import 'prismjs'
-import 'prismjs/themes/prism-tomorrow.css'
-import Prism from 'vue-prism-component'
-import store from '@/store/index'
+import { BFormFile } from 'bootstrap-vue'
 
 export default {
   components: {
     BCardCode,
-    VueGoodTable,
-    BAvatar,
-    BBadge,
-    BPagination,
-    BFormGroup,
-    BFormInput,
-    BFormSelect,
-    Prism,
-    BDropdownItem,
-    BDropdown,
+    BFormFile,
+  },
+}
+</script>
+`
+
+export const codeBasicFormDirection = `
+<template>
+  <vue-autosuggest
+    :suggestions="filteredOptions"
+    :limit="10"
+    :input-props="{id:'autosuggest__input',class:'form-control', placeholder:'Do you feel lucky?'}"
+    @input="onInputChange"
+  >
+    <template slot-scope="{suggestion}">
+      <span class="my-suggestion-item">{{ suggestion.item.name }}</span>
+    </template>
+  </vue-autosuggest>
+</template>
+
+<script>
+import { VueAutosuggest } from 'vue-autosuggest'
+
+export default {
+  components: {
+    VueAutosuggest,
   },
   data() {
     return {
-      log: [],
-      pageLength: 3,
-      dir: false,
-      pages: ['3', '5', '10'],
-      columns: [
-        {
-          label: 'Name',
-          field: 'fullName',
-        },
-        {
-          label: 'Email',
-          field: 'email',
-        },
-        {
-          label: 'Date',
-          field: 'startDate',
-        },
-        {
-          label: 'Salary',
-          field: 'salary',
-        },
-        {
-          label: 'Status',
-          field: 'status',
-        },
-        {
-          label: 'Action',
-          field: 'action',
-        },
-      ],
-      rows: [],
-      searchTerm: '',
-      status: [{
-        1: 'Current', 2: 'Professional', 3: 'Rejected', 4: 'Resigned', 5: 'Applied',
-      },
-      {
-        1: 'light-primary', 2: 'light-success', 3: 'light-danger', 4: 'light-warning', 5: 'light-info',
-      }],
+      datasuggest: [],
+      filteredOptions: [],
+      limit: 10,
+      selected: null,
     }
   },
-  computed: {
-    statusVariant() {
-      const statusColor = {
-        /* eslint-disable key-spacing */
-        Current      : 'light-primary',
-        Professional : 'light-success',
-        Rejected     : 'light-danger',
-        Resigned     : 'light-warning',
-        Applied      : 'light-info',
-        /* eslint-enable key-spacing */
-      }
-
-      return status => statusColor[status]
-    },
-    direction() {
-      if (store.state.appConfig.isRTL) {
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.dir = true
-        return this.dir
-      }
-      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      this.dir = false
-      return this.dir
-    },
-  },
   created() {
-    this.$http.get('/good-table/table_ssr')
-      .then(res => { this.rows = res.data })
+    this.$http.get('/autosuggest/data')
+      .then(res => { this.datasuggest = res })
   },
   methods: {
-    handleSearch(searching) {
-      this.log.push(\`The user searched for: \${searching}\`)
-    },
-    handleChangePage(page) {
-      this.log.push(\`The user changed the page to: \${page}\`)
-    },
-    handlePageChange(active) {
-      this.log.push(\`the user change page:  \${active}\`)
-    },
-    onSortChange(params) {
-      this.log.push(\`the user ordered:  \${params[0].type}\`)
+    onInputChange(text) {
+      if (text === '' || text === undefined) {
+        return
+      }
+
+      /* Full control over filtering. Maybe fetch from API?! Up to you!!! */
+      const filteredDevelopers = this.datasuggest.data[0].developers.filter(item => item.name.toLowerCase().indexOf(text.toLowerCase()) > -1).slice(0, this.limit)
+      const filteredDesigner = this.datasuggest.data[0].designers.filter(item => item.name.toLowerCase().indexOf(text.toLowerCase()) > -1).slice(0, this.limit)
+      const filteredData = filteredDevelopers.concat(filteredDesigner)
+      this.filteredOptions = [{
+        data: filteredData,
+      }]
     },
   },
 }
 </script>
+`
+
+export const codeAjax = `
+<template>
+  <div>
+    <vue-autosuggest
+      ref="autocomplete"
+      v-model="query"
+      :suggestions="suggestions"
+      :input-props="inputProps"
+      :section-configs="sectionConfigs"
+      :render-suggestion="renderSuggestion"
+      :get-suggestion-value="getSuggestionValue"
+      @input="fetchResults"
+    />
+
+    <b-card-text class="mt-1">
+      Selected element (object):
+    </b-card-text>
+    <b-card
+      class="border"
+      no-body
+    >
+      <pre>{{ JSON.stringify(selected, null, 4) }}</pre>
+    </b-card>
+  </div>
+</template>
+
+<script>
+/* eslint-disable vue/no-unused-components */
+/* eslint no-unused-expressions: ["error", { "allowShortCircuit": true }] */
+import { BCard, BCardText, BAvatar } from 'bootstrap-vue'
+import { VueAutosuggest } from 'vue-autosuggest'
+import axios from 'axios'
+
+export default {
+  components: {
+    VueAutosuggest,
+    BCard,
+    BCardText,
+    BAvatar,
+  },
+  data() {
+    return {
+      query: '',
+      results: [],
+      timeout: null,
+      selected: null,
+      debounceMilliseconds: 250,
+      usersUrl: 'https://jsonplaceholder.typicode.com/users',
+      photosUrl: 'https://jsonplaceholder.typicode.com/photos',
+      inputProps: {
+        id: 'autosuggest__input_ajax',
+        placeholder: 'Do you feel lucky, punk?',
+        class: 'form-control',
+        name: 'ajax',
+      },
+      suggestions: [],
+      sectionConfigs: {
+        destinations: {
+          limit: 6,
+          label: 'Destination',
+          onSelected: selected => {
+            this.selected = selected.item
+          },
+        },
+        hotels: {
+          limit: 6,
+          label: 'Hotels',
+          onSelected: selected => {
+            this.selected = selected.item
+          },
+        },
+      },
+    }
+  },
+  methods: {
+    fetchResults() {
+      const { query } = this
+
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        const photosPromise = axios.get(this.photosUrl)
+        const usersPromise = axios.get(this.usersUrl)
+
+        Promise.all([photosPromise, usersPromise]).then(values => {
+          this.suggestions = []
+          this.selected = null
+
+          const photos = this.filterResults(values[0].data, query, 'title')
+          const users = this.filterResults(values[1].data, query, 'name')
+          users.length && this.suggestions.push({ name: 'destinations', data: users })
+          photos.length && this.suggestions.push({ name: 'hotels', data: photos })
+        })
+      }, this.debounceMilliseconds)
+    },
+    filterResults(data, text, field) {
+      return data.filter(item => {
+        if (item[field].toLowerCase().indexOf(text.toLowerCase()) > -1) {
+          return item[field]
+        }
+        return false
+      }).sort()
+    },
+    renderSuggestion(suggestion) {
+      if (suggestion.name === 'hotels') {
+        const image = suggestion.item
+        return (
+          <div class="d-flex">
+            <div>
+              <b-avatar src={image.thumbnailUrl} class="mr-50"></b-avatar>
+            </div>
+            <div>
+              <span>{image.title}</span>
+            </div>
+          </div>
+        )
+      }
+      return suggestion.item.name
+    },
+    getSuggestionValue(suggestion) {
+      const { name, item } = suggestion
+      return name === 'hotels' ? item.title : item.name
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+pre{
+  min-height: 295px;
+  padding: 1.5rem;
+  margin-bottom: 0;
+  border-radius: .5rem;
+}
+</style>
 `

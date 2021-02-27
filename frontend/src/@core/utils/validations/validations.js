@@ -3,6 +3,7 @@ import {
   required as rule_required,
   email as rule_email,
   min as rule_min,
+  max as rule_max,
   confirmed as rule_confirmed,
   regex as rule_regex,
   between as rule_between,
@@ -17,17 +18,28 @@ import ar from 'vee-validate/dist/locale/ar.json'
 import en from 'vee-validate/dist/locale/en.json'
 
 // eslint-disable-next-line object-curly-newline
-import { validatorPositive, validatorUrlValidator, validatorPassword, validatorCreditCard } from './validators'
-
+import {
+  validatorPositive,
+  validatorUrlValidator,
+  validatorPassword,
+  validatorCreditCard,
+  validatorCURP,
+  validatorRFC,
+  validatorNames,
+  validatorAge,
+  validatorHeight,
+  validatorFilePFD,
+} from './validators'
 // ////////////////////////////////////////////////////////
 // General
 // ////////////////////////////////////////////////////////
-
 export const required = extend('required', rule_required)
 
 export const email = extend('email', rule_email)
 
 export const min = extend('min', rule_min)
+
+export const max = extend('max', rule_max)
 
 export const confirmed = extend('confirmed', rule_confirmed)
 
@@ -65,6 +77,36 @@ export const password = extend('password', {
 export const url = extend('url', {
   validate: validatorUrlValidator,
   message: 'URL is invalid',
+})
+
+export const curp = extend('curp', {
+  validate: validatorCURP,
+  message: 'Campo no valido',
+})
+
+export const rfc = extend('rfc', {
+  validate: validatorRFC,
+  message: 'Campo no valido',
+})
+
+export const name = extend('name', {
+  validate: validatorNames,
+  message: 'Campo no valido',
+})
+
+export const age = extend('age', {
+  validate: validatorAge,
+  message: 'Campo no valido',
+})
+
+export const height = extend('height', {
+  validate: validatorHeight,
+  message: 'Campo no valido',
+})
+
+export const file = extend('file', {
+  validate: validatorFilePFD,
+  message: 'El archivo seleccionado no es valido',
 })
 
 // Install English and Arabic localizations.

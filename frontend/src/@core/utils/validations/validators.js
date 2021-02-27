@@ -30,3 +30,49 @@ export const validatorUrlValidator = val => {
   /* eslint-enable no-useless-escape */
   return re.test(val)
 }
+
+export const validatorCURP = curp => {
+  if (curp.length === 18) {
+    const cRegExp = /([A-Za-z0-9])$/
+    return cRegExp.test(curp)
+  }
+  return false
+}
+
+export const validatorRFC = rfc => {
+  if (rfc.length === 13) {
+    const cRegExp = /([A-Za-z0-9])$/
+    return cRegExp.test(rfc)
+  }
+  return false
+}
+
+export const validatorNames = name => {
+  const re = /([A-Za-z])$/
+  return re.test(name)
+}
+
+export const validatorAge = age => {
+  const re = /([0-9])$/
+  if (re.test(age) && age >= 18 && age <= 40) {
+    return true
+  }
+  return false
+}
+
+export const validatorHeight = height => {
+  const re = /([0-9])$/
+  if (re.test(height) && height >= 150 && height <= 250) {
+    return true
+  }
+  return false
+}
+
+export const validatorFilePFD = file => {
+  const SIZE_FILE = 2097152
+  const TYPE_FILE = 'application/pdf'
+  if (file.size <= SIZE_FILE && file.type === TYPE_FILE) {
+    return true
+  }
+  return false
+}

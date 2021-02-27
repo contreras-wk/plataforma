@@ -1,5 +1,5 @@
-//<template>
-  <h1>REGISTRO PREBECARIOS</h1>
+<template>
+
 </template>
 
 <script>

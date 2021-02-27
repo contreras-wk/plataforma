@@ -1,5 +1,5 @@
 <template>
-  <b-card-code title="Basic Table">
+  <b-card-code title="Prebecarios">
 
     <!-- search input -->
     <div class="custom-search d-flex justify-content-end">
@@ -163,6 +163,7 @@ import {
 } from 'bootstrap-vue'
 import { VueGoodTable } from 'vue-good-table'
 import store from '@/store/index'
+
 import useJwt from '@/auth/jwt/useJwt'
 import { codeBasic } from './code'
 
@@ -262,9 +263,6 @@ export default {
       .catch(error => {
         console.log(`[ERROR]: ${error}`)
       })
-
-    // this.$http.get('/good-table/basic')
-    //   .then(res => { this.rows = res.data })
   },
 }
 </script>

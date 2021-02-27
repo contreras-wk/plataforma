@@ -3,7 +3,7 @@ export default [
   {
     path: '/prebecarios-registro',
     name: 'prebecarios-registro',
-    component: () => import('@/views/candidates/Candidate.vue'),
+    component: () => import('@/views/candidates/CandidateRegister.vue'),
     meta: {
       requiresAuth: false,
       layout: 'full',
