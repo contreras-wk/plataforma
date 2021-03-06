@@ -8,17 +8,19 @@
       shape="square"
       finish-button-text="Enviar"
       back-button-text="Atras"
+      next-button-text="Siguiente"
       class="m-3"
       @on-complete="formSubmitted"
     >
 
       <!-- Datos Personales -->
-      <!-- :before-change="validationForm" -->
+      <!-- :before-change="validationFormDataPersonal" -->
       <tab-content
         title="Datos Personales"
+        :before-change="validationFormDataPersonal"
       >
         <validation-observer
-          ref="accountRules"
+          ref="dataPersonalRules"
           tag="form"
         >
           <b-row>
@@ -40,6 +42,7 @@
               >
                 <validation-provider
                   #default="{ errors }"
+                  name="CURP"
                   rules="curp|required"
                 >
                   <b-form-input
@@ -79,7 +82,7 @@
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="name"
+                  name="Nombre(s)"
                   rules="name|required"
                 >
                   <b-form-input
@@ -99,7 +102,7 @@
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="last_name"
+                  name="Apellido Paterno"
                   rules="name|required"
                 >
                   <b-form-input
@@ -119,7 +122,7 @@
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="mothers_last_name"
+                  name="Apellido Materno"
                   rules="name|required"
                 >
                   <b-form-input
@@ -140,13 +143,14 @@
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="age"
+                  name="Edad"
                   rules="age|required"
                 >
                   <b-form-input
                     id="age"
                     v-model="form.age"
                     :state="errors.length > 0 ? false:null"
+                    type="number"
                     placeholder="Edad"
                   />
                   <small class="text-danger">{{ errors[0] }}</small>
@@ -156,7 +160,7 @@
             <b-col md="4">
               <validation-provider
                 #default="{ errors }"
-                name="gender"
+                name="Género"
                 rules="required"
               >
                 <b-form-group
@@ -167,11 +171,12 @@
                 >
                   <v-select
                     id="gender"
-                    v-model="form.gender"
+                    v-model="selc_gender"
                     :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                    :options="genderOptions"
-                    :selectable="option => ! option.value.includes('select_value')"
+                    :options="optionsGender"
+                    :selectable="option => option.value"
                     placeholder="selecciona una opción"
+                    value="value"
                     label="text"
                   />
                   <b-form-invalid-feedback :state="errors.length > 0 ? false:null">
@@ -187,13 +192,14 @@
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="height"
+                  name="Estatura"
                   rules="height|required"
                 >
                   <b-form-input
                     id="height"
                     v-model="form.height"
                     :state="errors.length > 0 ? false:null"
+                    type="number"
                     placeholder="Estura en [cm], ejemplo 175"
                   />
                   <small class="text-danger">{{ errors[0] }}</small>
@@ -205,7 +211,7 @@
       </tab-content>
 
       <!-- Estudios -->
-      <!-- :before-change="validationFormInfo" -->
+      <!--  :before-change="validationFormStudies" -->
       <tab-content
         title="Estudios"
       >
@@ -227,7 +233,7 @@
             <b-col md="6">
               <validation-provider
                 #default="{ errors }"
-                name="stuies"
+                name="Ultimo grado de estudios"
                 rules="required"
               >
                 <b-form-group
@@ -237,7 +243,7 @@
                 >
                   <v-select
                     id="stuies"
-                    v-model="studies.level_of_studies"
+                    v-model="selc_lvl_std"
                     :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
                     :options="optionsLevelStudies"
                     :selectable="option => ! option.value.includes('select_value')"
@@ -252,7 +258,7 @@
 
             <!-- TIPO DE ESTUDIOS -->
             <b-col md="6"
-              v-if="studies.level_of_studies.value === optionsLevelStudies[0].value"
+              v-if="selc_lvl_std.value === optionsLevelStudies[0].value"
             >
               <validation-provider
                 #default="{ errors }"
@@ -266,9 +272,9 @@
                 >
                   <v-select
                     id="type-school"
-                    v-model="studies.details"
+                    v-model="selc_type_bach"
                     :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                    :options="typeSchool"
+                    :options="optionsTypeSchool"
                     :selectable="option => ! option.value.includes('nothing_selected')"
                     label="text"
                   />
@@ -281,21 +287,22 @@
 
             <!-- DETALLES LICENCIATURA | MAESTRIA | DOCTORADO -->
             <b-col md="6"
-              v-if="studies.level_of_studies.value !== optionsLevelStudies[0].value && studies.level_of_studies.value"
+              v-if="selc_lvl_std.value !== optionsLevelStudies[0].value && selc_lvl_std.value"
             >
               <b-form-group
-                :label="studies.level_of_studies.value"
+                :label="selc_lvl_std.value"
                 label-for="details"
               >
                 <validation-provider
                   #default="{ errors }"
+                  :name="selc_lvl_std.value"
                   rules="required"
                 >
                   <b-form-input
                     id="details"
-                    v-model="form.curp"
+                    v-model="studies.details"
                     :state="errors.length > 0 ? false:null"
-                    :placeholder="studies.level_of_studies.value + ' en ...'"
+                    :placeholder="selc_lvl_std.value + ' en ...'"
                   />
                   <small class="text-danger">{{ errors[0] }}</small>
                 </validation-provider>
@@ -324,70 +331,68 @@
               </h5>
               <small class="text-muted">Ingresa los datos sobre tu dirección</small>
             </b-col>
-
             <!-- BUSQUEDA -->
             <b-col
               cols="12"
               class="mb-2"
             >
-              <h3>aqui va la busqueda</h3>
-              <search-direction />
+              <vue-autosuggest
+                v-model="selected"
+                :suggestions="filteredOptions"
+                :limit="10"
+                :get-suggestion-value="getSuggestionValue"
+                :input-props="{id:'autosuggest__input',class:'form-control', placeholder:'Calle, Número, Código Postal'}"
+                @input="onInputChange"
+              >
+                <template slot-scope="{suggestion}">
+                  <span class="my-suggestion-item">{{ suggestion.item.title }}</span>
+                </template>
+              </vue-autosuggest>
             </b-col>
 
             <!-- LUGAR DE RESIDENCIA -->
             <b-col md="6">
-              <validation-provider
-                #default="{ errors }"
-                name="place-residence"
-                rules="required"
+              <b-form-group
+                label="Lugar de Residencia"
+                label-for="place-residence"
               >
-                <b-form-group
-                  label="Lugar de Residencia"
-                  label-for="place-residence"
-                  :state="errors.length > 0 ? false:null"
+                <validation-provider
+                  #default="{ errors }"
+                  name="Lugar de residencia"
+                  rules="name|required"
                 >
-                <!-- :selectable="option => ! option.value.includes('select_value')" -->
-                  <v-select
+                  <b-form-input
                     id="place-residence"
                     v-model="direction.place_of_residence"
-                    :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                    :options="optionsPlaceResidence"
-                    :selectable="option => ! option.state.includes('select_value')"
-                    label="state"
-                    placeholder="Estado"
+                    type="text"
+                    :state="errors.length > 0 ? false:null"
+                    placeholder="Lugar de residencia"
                   />
-                  <b-form-invalid-feedback :state="errors.length > 0 ? false:null">
-                    {{ errors[0] }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </validation-provider>
+                  <small class="text-danger">{{ errors[0] }}</small>
+                </validation-provider>
+              </b-form-group>
             </b-col>
 
             <!-- DELEGACION o MUNICIPIO -->
             <b-col md="6">
-              <validation-provider
-                #default="{ errors }"
-                name="delegation"
-                rules="required"
+              <b-form-group
+                label="Delegación o Municipio"
+                label-for="delegation"
               >
-                <b-form-group
-                  label="Delegación o Municipio"
-                  label-for="delegation"
-                  :state="errors.length > 0 ? false:null"
+                <validation-provider
+                  #default="{ errors }"
+                  name="Delegación o municipio"
+                  rules="name|required"
                 >
-                  <v-select
+                  <b-form-input
                     id="delegation"
                     v-model="direction.delegation"
-                    :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
-                    :options="optionsDelegation"
-                    :selectable="option => ! option.value.includes('select_value')"
-                    placeholder="Delegación o Municipio"
+                    :state="errors.length > 0 ? false:null"
+                    placeholder="Delegación o municipio"
                   />
-                  <b-form-invalid-feedback :state="errors.length > 0 ? false:null">
-                    {{ errors[0] }}
-                  </b-form-invalid-feedback>
-                </b-form-group>
-              </validation-provider>
+                  <small class="text-danger">{{ errors[0] }}</small>
+                </validation-provider>
+              </b-form-group>
             </b-col>
 
             <!-- COLONIA -->
@@ -398,8 +403,8 @@
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="suburb"
-                  rules="required"
+                  name="Colonia"
+                  rules="name|required"
                 >
                   <b-form-input
                     id="suburb"
@@ -420,8 +425,8 @@
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="postal-code"
-                  rules="required"
+                  name="Código postal"
+                  rules="digits:5|required"
                 >
                   <b-form-input
                     id="postal-code"
@@ -443,7 +448,7 @@
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="street"
+                  name="Calle"
                   rules="required"
                 >
                   <b-form-input
@@ -465,7 +470,7 @@
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="num-out"
+                  name="Número exterior"
                   rules="required"
                 >
                   <b-form-input
@@ -488,7 +493,7 @@
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="num-in"
+                  name="Número interior"
                 >
                   <b-form-input
                     id="num-in"
@@ -527,20 +532,20 @@
             </b-col>
             <b-col md="6">
               <b-form-group
-                label="Telefono"
+                label="Teléfono"
                 label-for="telephone"
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="telephone"
+                  name="Teléfono"
                   rules="digits:10|required"
                 >
                   <b-form-input
                     id="telephone"
-                    v-model="twitterUrl"
+                    v-model="contact.telephone"
                     type="number"
                     :state="errors.length > 0 ? false:null"
-                    placeholder=""
+                    placeholder="Teléfono (Local)"
                   />
                   <small class="text-danger">{{ errors[0] }}</small>
                 </validation-provider>
@@ -548,7 +553,7 @@
             </b-col>
             <b-col md="6">
               <b-form-group
-                label="Telefono Celular"
+                label="Teléfono Celular"
                 label-for="mobile-telephone"
               >
                 <validation-provider
@@ -561,7 +566,7 @@
                     v-model="contact.mobile_telephone"
                     :state="errors.length > 0 ? false:null"
                     type="number"
-                    placeholder="5511223344"
+                    placeholder="Teléfono celular(10 digitos)"
                   />
                   <small class="text-danger">{{ errors[0] }}</small>
                 </validation-provider>
@@ -569,19 +574,19 @@
             </b-col>
             <b-col md="6">
               <b-form-group
-                label="Correo Electronico"
+                label="Correo Electrónico"
                 label-for="email"
               >
                 <validation-provider
                   #default="{ errors }"
-                  name="email"
+                  name="Correo electrónico"
                   rules="required|email"
                 >
                   <b-form-input
                     id="email"
                     v-model="contact.email"
                     :state="errors.length > 0 ? false:null"
-                    placeholder="corre@dominio.com"
+                    placeholder="correo@dominio.com"
                   />
                   <small class="text-danger">{{ errors[0] }}</small>
                 </validation-provider>
@@ -608,7 +613,7 @@
               <h5 class="mb-0">
                 Documentos
               </h5>
-              <small class="text-muted">Carga tus archivos que se te piden, estos debedn de estar en escaneados y en Formato PDF con un tamaño menor a 2MB</small>
+              <small class="text-muted">Carga tus archivos que se te piden, estos debedn de estar en escaneados y en Formato PDF con un tamaño menor a 5 MB</small>
             </b-col>
 
             <!-- ARCHIVO CURP -->
@@ -617,10 +622,9 @@
                 label="CURP"
                 label-for="file-curp"
               >
-              <!-- #default="{ errors }" -->
                 <validation-provider
                   #default="{ errors }"
-                  name="file-curp"
+                  name="archivo curp"
                   rules="file|required"
                 >
                   <b-form-file
@@ -659,14 +663,224 @@
                 </validation-provider>
               </b-form-group>
             </b-col>
+            <!-- ARCHIVO ACTA DE NACIMIENTO -->
+            <b-col md="6">
+              <b-form-group
+                label="Acta de Nacimiento"
+                label-for="file-birth-certificate"
+              >
+                <validation-provider
+                  #default="{ errors }"
+                  name="archivo Acta de Nacimiento"
+                  rules="file|required"
+                >
+                  <b-form-file
+                    id="file-birth-certificate"
+                    v-model="documents.file_birth_certificate"
+                    accept=".pdf"
+                    :state="errors.length > 0 ? false:null"
+                    placeholder="Archivo no seleccionado"
+                    browse-text="Buscar"
+                  />
+                  <small class="text-danger">{{ errors[0] }}</small>
+                </validation-provider>
+              </b-form-group>
+            </b-col>
+            <!-- ARCHIVO INE -->
+            <b-col md="6">
+              <b-form-group
+                label="INE"
+                label-for="file-ine"
+              >
+                <validation-provider
+                  #default="{ errors }"
+                  name="INE"
+                  rules="file|required"
+                >
+                  <b-form-file
+                    id="file-ine"
+                    v-model="documents.file_ine"
+                    accept=".pdf"
+                    :state="errors.length > 0 ? false:null"
+                    placeholder="Archivo no seleccionado"
+                    browse-text="Buscar"
+                  />
+                  <small class="text-danger">{{ errors[0] }}</small>
+                </validation-provider>
+              </b-form-group>
+            </b-col>
+            <!-- ARCHIVO COMPROBANTE DE DOMICILIO -->
+            <b-col md="6">
+              <b-form-group
+                label="Comprobante de Domicilio"
+                label-for="file-proof-address"
+              >
+                <validation-provider
+                  #default="{ errors }"
+                  name="Comprobande de Domicilio"
+                  rules="file|required"
+                >
+                  <b-form-file
+                    id="file-proof-address"
+                    v-model="documents.file_proof_address"
+                    accept=".pdf"
+                    :state="errors.length > 0 ? false:null"
+                    placeholder="Archivo no seleccionado"
+                    browse-text="Buscar"
+                  />
+                  <small class="text-danger">{{ errors[0] }}</small>
+                </validation-provider>
+              </b-form-group>
+            </b-col>
+            <!-- ARCHIVO COMPROBANTE DE ESTUDIOS -->
+            <b-col md="6">
+              <b-form-group
+                label="Comprobante de Estudios"
+                label-for="file-ine"
+              >
+                <validation-provider
+                  #default="{ errors }"
+                  name="Comprobande de Estudios"
+                  rules="file|required"
+                >
+                  <b-form-file
+                    id="file-proof-studies"
+                    v-model="documents.file_proof_studies"
+                    accept=".pdf"
+                    :state="errors.length > 0 ? false:null"
+                    placeholder="Archivo no seleccionado"
+                    browse-text="Buscar"
+                  />
+                  <small class="text-danger">{{ errors[0] }}</small>
+                </validation-provider>
+              </b-form-group>
+            </b-col>
           </b-row>
         </validation-observer>
       </tab-content>
 
       <!-- Acerca de la convocatoria -->
+      <!-- :before-change="validationFormCallInfo" -->
       <tab-content
         title="Convocatoria"
       >
+      <validation-observer
+        ref="callInfoRules"
+        tag="form"
+      >
+        <b-row>
+          <b-col
+            cols="12"
+            class="mb-2"
+          >
+            <h5 class="mb-0">
+              Acerca de la convocatoria
+            </h5>
+            <small class="text-muted">Ingresa los datos acerca de como te enteraste acerca de la convocatoria.</small>
+          </b-col>
+
+          <b-col md="6">
+            <validation-provider
+              #default="{ errors }"
+              name="medio"
+              rules="required"
+            >
+              <b-form-group
+                label="¿Cual fue el medio por el cual se enteró de la convocatoria?"
+                label-for="medium"
+                :state="errors.length > 0 ? false:null"
+              >
+                <v-select
+                  id="medium"
+                  v-model="call_info.medium"
+                  :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
+                  :options="optionsMediumCallInfo"
+                  :selectable="option => ! option.value.includes('select_value')"
+                  label="text"
+                >
+                <b-form-invalid-feedback :state="errors.length > 0 ? false:null">
+                  {{ errors[0] }}
+                </b-form-invalid-feedback>
+                </v-select>
+              </b-form-group>
+            </validation-provider>
+          </b-col>
+          <!-- v-if="studies.level_of_studies.value !== optionsLevelStudies[0].value && studies.level_of_studies.value" -->
+          <b-col md="6"
+            v-if="call_info.medium.value === optionsMediumCallInfo[2].value ||
+              call_info.medium.value === optionsMediumCallInfo[6].value ||
+              call_info.medium.value === optionsMediumCallInfo[7].value ||
+              call_info.medium.value === optionsMediumCallInfo[9].value"
+          >
+              <b-form-group
+                :label="'ESPECIFICA ' + call_info.medium.value"
+                label-for="call-info-medium"
+              >
+                <validation-provider
+                  #default="{ errors }"
+                  :name="call_info.medium.value"
+                  rules="required"
+                >
+                  <b-form-input
+                    id="call-info-medium"
+                    v-model="call_info.medium_details"
+                    :state="errors.length > 0 ? false:null"
+                  />
+                  <small class="text-danger">{{ errors[0] }}</small>
+                </validation-provider>
+              </b-form-group>
+            </b-col>
+            <!-- ######################################### -->
+            <b-col md="6">
+            <validation-provider
+              #default="{ errors }"
+              name="medio"
+              rules="required"
+            >
+              <b-form-group
+                label="¿Que fue lo que le atrajo de la convocataria?"
+                label-for="attraction"
+                :state="errors.length > 0 ? false:null"
+              >
+                <v-select
+                  id="attraction"
+                  v-model="call_info.attraction"
+                  :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
+                  :options="optionsAttractionCallInfo"
+                  :selectable="option => ! option.value.includes('select_value')"
+                  label="text"
+                >
+                <b-form-invalid-feedback :state="errors.length > 0 ? false:null">
+                  {{ errors[0] }}
+                </b-form-invalid-feedback>
+                </v-select>
+              </b-form-group>
+            </validation-provider>
+          </b-col>
+          <!-- v-if="studies.level_of_studies.value !== optionsLevelStudies[0].value && studies.level_of_studies.value" -->
+          <b-col md="6"
+            v-if="call_info.attraction.value === optionsAttractionCallInfo[3].value"
+          >
+              <b-form-group
+                label="Especifica cual "
+                label-for="call-info-medium"
+              >
+                <validation-provider
+                  #default="{ errors }"
+                  :name="call_info.medium.value"
+                  rules="required"
+                >
+                  <b-form-input
+                    id="call-info-medium"
+                    v-model="call_info.attraction_details"
+                    :state="errors.length > 0 ? false:null"
+                  />
+                  <small class="text-danger">{{ errors[0] }}</small>
+                </validation-provider>
+              </b-form-group>
+            </b-col>
+        </b-row>
+      </validation-observer>
       </tab-content>
     </form-wizard>
 
@@ -674,9 +888,10 @@
 </template>
 
 <script>
+import { VueAutosuggest } from 'vue-autosuggest'
 import { FormWizard, TabContent } from 'vue-form-wizard'
 import vSelect from 'vue-select'
-import { ValidationProvider, ValidationObserver } from 'vee-validate'
+import { ValidationProvider, ValidationObserver, localize } from 'vee-validate'
 import ToastificationContent from '@core/components/toastification/ToastificationContent.vue'
 import 'vue-form-wizard/dist/vue-form-wizard.min.css'
 import {
@@ -688,8 +903,14 @@ import {
   BFormInvalidFeedback,
 } from 'bootstrap-vue'
 import { required, email } from '@validations'
-import SearchDirection from './SearchDirection.vue'
-import { codeIcon, codeLimiting } from './code'
+// import SearchDirection from './SearchDirection.vue'
+import es from 'vee-validate/dist/locale/es.json'
+import axios from 'axios'
+// import useJwt from '@/auth/jwt/useJwt'
+import save from './save'
+import { codeIcon, codeLimiting } from '../code'
+
+localize('es', es)
 
 export default {
   components: {
@@ -707,11 +928,15 @@ export default {
     vSelect,
     // eslint-disable-next-line vue/no-unused-components
     ToastificationContent,
-    SearchDirection,
+    VueAutosuggest,
+    // SearchDirection,0
   },
   data() {
     return {
       showTypeSchool: false,
+      selc_gender: '',
+      selc_lvl_std: '',
+      selc_type_bach: '',
       form: {
         curp: '',
         rfc: '',
@@ -742,7 +967,26 @@ export default {
       },
       documents: {
         file_curp: null,
+        file_rfc: null,
+        file_birth_certificate: null,
+        file_ine: null,
+        file_proof_address: null,
+        file_proof_studies: null,
+        file_proof_courses: null,
       },
+      call_info: {
+        medium: '',
+        medium_details: '',
+        attraction: '',
+        attraction_details: '',
+      },
+      // VARS FOR AUTOCOMPLETE DIRECTION
+      datasuggest: [],
+      filteredOptions: [],
+      limit: 20,
+      selected: '',
+      dir: null,
+      // #############
       selectedContry: '',
       selectedLanguage: '',
       name: '',
@@ -763,9 +1007,9 @@ export default {
       email,
       codeIcon,
       codeLimiting,
-      genderOptions: [
-        { value: 'Femenino', text: 'Femenino' },
-        { value: 'Masculino', text: 'Masculino' },
+      optionsGender: [
+        { value: 'F', text: 'Femenino' },
+        { value: 'M', text: 'Masculino' },
       ],
       optionsLevelStudies: [
         { value: 'Bachillerato', text: 'Bachillerato' },
@@ -773,7 +1017,7 @@ export default {
         { value: 'Maestría', text: 'Maestría' },
         { value: 'Doctorado', text: 'Doctorado' },
       ],
-      typeSchool: [
+      optionsTypeSchool: [
         { value: 'BACHILLERES', text: 'BACHILLERES' },
         { value: 'CBT', text: 'CBT' },
         { value: 'CBTIS', text: 'CEBETIS' },
@@ -787,43 +1031,82 @@ export default {
         { value: 'PREPARATORIA ESTATAL', text: 'PREPARATORIA ESTATAL' },
         { value: 'SISTEMA ABIERTO', text: 'SISTEMA ABIERTO' },
       ],
-      optionsPlaceResidence: [],
-      optionsDelegation: [],
+      optionsMediumCallInfo: [
+        { value: 'AMISTAD O PARIENTE', text: 'AMISTAD O PARIENTE' },
+        { value: 'CONOCIDO', text: 'CONOCIDO' },
+        { value: 'FERIA DE EMPLEO', text: 'FERIA DE EMPLEO' },
+        { value: 'INTERNET', text: 'INTERNET' },
+        { value: 'LLAMADA TELÉFONICA', text: 'LLAMADA TELÉFONICA' },
+        { value: 'METRO', text: 'METRO' },
+        { value: 'OTRO', text: 'OTRO' },
+        { value: 'PERIÓDICO', text: 'PERIÓDICO' },
+        { value: 'POLICÍA', text: 'POLICÍA' },
+        { value: 'SISTEMA NACIONAL DE EMPLEO', text: 'SISTEMA NACIONAL DE EMPLEO' },
+        { value: 'TELEVISION', text: 'TELEVISION' },
+        { value: 'VOLANTE', text: 'VOLANTE' },
+      ],
+      optionsAttractionCallInfo: [
+        { value: 'DESARROLLO PERSONAL', text: 'DESARROLLO PERSONAL' },
+        { value: 'ESTABILIDAD ECONÓMICA', text: 'ESTABILIDAD ECONÓMICA' },
+        { value: 'OPORTUNIDAD DE TRABAJO', text: 'OPORTUNIDAD DE TRABAJO' },
+        { value: 'OTRA OPCION', text: 'OTRA OPCION' },
+        { value: 'POR VOCACIÓN', text: 'POR VOCACIÓN' },
+        { value: 'PRESTACIONES', text: 'PRESTACIONES' },
+        { value: 'SERVIVIO A MI CIUDAD', text: 'SERVIVIO A MI CIUDAD' },
+        { value: 'SUELDO', text: 'SUELDO' },
+      ],
     }
   },
-  // update: function () {
-  //   console.log('Esta actualizando cambios')
-  // },
   updated() {
-    console.log('Método UPDATE')
-    // EN ESTA SECCION SE HACE PETICION A LA API UNIPOL PARA CONSULTAR LAS DELEGACIONES O MUNICIPIOS
-    console.log(this.documents.file_curp)
-    // if (this.documents.file_curp.size <= 2097152) {
-    //   console.log('Archivo Valido')
-    // }
   },
   // watch() {
   // },
   methods: {
-    showInput() {
-      // console.log('>>>>>>')
-      // console.log(JSON.stringify(this.studies.level_of_studies.text))
-      // console.log(this.showTypeSchool)
-      // return this.showTypeSchool
-    },
     formSubmitted() {
-      this.$toast({
-        component: ToastificationContent,
-        props: {
-          title: 'Form Submitted',
-          icon: 'EditIcon',
-          variant: 'success',
-        },
-      })
+      // Datos personales
+      this.form.gender = this.selc_gender.value
+      // Estudios
+      this.studies.level_of_studies = this.selc_lvl_std.value
+      if (this.studies.level_of_studies === this.optionsLevelStudies[0].value) {
+        this.studies.details = this.selc_type_bach.value
+        console.log('Asigno el tipo de bachilleres')
+      }
+      // Dirección no aignaciones
+      if (!this.direction.num_inside) {
+        delete this.direction.num_inside
+      }
+      console.log(this.contact)
+      console.log('##############################')
+      console.log(this.documents)
+      save(
+        this.form,
+        this.studies,
+        this.direction,
+        this.contact,
+        this.documents,
+      )
+      // console.log('enviar formulario')
+      // this.form.gender = this.selc_gender.value
+      // console.log(this.form)
+      // useJwt.saveCandidate(this.form)
+      //   .then(response => {
+      //     console.log(response)
+      //     this.$toast({
+      //       component: ToastificationContent,
+      //       props: {
+      //         title: 'Su registro ha sido completado',
+      //         icon: 'CheckCircleIcon',
+      //         variant: 'success',
+      //       },
+      //     })
+      //   })
+      //   .catch(error => {
+      //     console.log(error)
+      //   })
     },
-    validationForm() {
+    validationFormDataPersonal() {
       return new Promise((resolve, reject) => {
-        this.$refs.accountRules.validate().then(success => {
+        this.$refs.dataPersonalRules.validate().then(success => {
           if (success) {
             resolve(true)
           } else {
@@ -866,13 +1149,66 @@ export default {
         })
       })
     },
+    // validationFormDocuments() {
+    //   return new Preomise((resolve, reject) => {
+    //     this.$refs.s
+    //   })
+    // },
+    // ###########################################
+    onInputChange(text) {
+      console.log(this.dir)
+      console.log('########################')
+      // console.log('onInputChange')
+      if (text === '' || text === undefined) {
+        this.filteredOptions = []
+        this.selected = ''
+        this.dir = null
+        this.direction.place_of_residence = ''
+        this.direction.delegation = ''
+        this.direction.suburb = ''
+        this.direction.postal_code = ''
+        this.direction.street = ''
+        this.direction.num_outdoor = ''
+        return
+      }
+      // GEOCODE
+      // const url = `https://geocode.search.hereapi.com/v1/geocode?q=${text}&in=countryCode:MEX&apiKey=WnMOYAfN-NKNdKhRyMWxnXHzg-psiHuRzz576BKAN2g`
+      // PLACE
+      // const url = `https://places.api.here.com/places/v1/discover/search?at=19.4978,-99.1269&tf=plain&addressFilter=countryCode=MEX&q=${text}&app_id=CPBypQwM5DBlqg0kVMIK&app_code=NXIYJllYjgaayfuimeBPCg`
+      // AUTOCOMPLETE
+      const url = `https://autocomplete.search.hereapi.com/v1/autocomplete?q=${text}&in=countryCode:MEX&apiKey=WnMOYAfN-NKNdKhRyMWxnXHzg-psiHuRzz576BKAN2g`
+      axios.get(url)
+        .then(response => {
+          if (response.status !== 400) {
+            this.datasuggest = response.data.items
+            console.log(this.datasuggest)
+            this.filteredOptions = [{
+              data: this.datasuggest,
+            }]
+          }
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+    getSuggestionValue(suggestion) {
+      this.dir = suggestion.item.address
+      this.direction.place_of_residence = this.dir.state
+      this.direction.delegation = this.dir.city
+      this.direction.suburb = this.dir.district
+      this.direction.postal_code = this.dir.postalCode
+      this.direction.street = this.dir.street
+      this.direction.num_outdoor = this.dir.houseNumber
+      // this.direction.
+      return suggestion.item.title
+    },
   },
   created() {
-    // EN ESTA SECCION SE HACE PETICION A LA API UNIPOL PARA CONSULTAR LOS ESTADOS DE LA REPUBLICA
-    // console.log('Método CREATED')
-    // this.optionsPlaceResidence = states
-    // this.optionsDelegation = delegations
-    // console.log(this.optionsDelegation)
+
   },
 }
 </script>
+
+<style lang="scss">
+@import '@core/scss/vue/libs/vue-autosuggest.scss';
+</style>

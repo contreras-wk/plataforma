@@ -1,3 +1,4 @@
+from django.db.models import query
 from rest_framework import generics
 
 from .models import * 
@@ -12,7 +13,9 @@ class CandidateRUD(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CandidateSerializer
     # serializer_class = CandidateDetailsSerializer
 
-
+class CandidateDetails(generics.RetrieveAPIView):
+    queryset = Candidate.objects.all()
+    serializer_class = CandidateDetailsSerializer
 
 class DocumentsC(generics.CreateAPIView):
     serializer_class = DocumentsSerializer

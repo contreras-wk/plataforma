@@ -69,10 +69,9 @@ export const validatorHeight = height => {
 }
 
 export const validatorFilePFD = file => {
-  const SIZE_FILE = 2097152
+  // 1 MB = 1048576 bytes
+  // Size to file is five Megabytes
+  const SIZE_FILE = 5242880
   const TYPE_FILE = 'application/pdf'
-  if (file.size <= SIZE_FILE && file.type === TYPE_FILE) {
-    return true
-  }
-  return false
+  return file.size <= SIZE_FILE && file.type === TYPE_FILE
 }

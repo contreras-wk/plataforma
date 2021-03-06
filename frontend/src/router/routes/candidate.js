@@ -3,7 +3,7 @@ export default [
   {
     path: '/prebecarios-registro',
     name: 'prebecarios-registro',
-    component: () => import('@/views/candidates/CandidateRegister.vue'),
+    component: () => import('@/views/candidates/form/CandidateRegister.vue'),
     meta: {
       requiresAuth: false,
       layout: 'full',
@@ -12,7 +12,7 @@ export default [
   {
     path: '/prebecarios-seleccion',
     name: 'prebecarios-seleccion',
-    component: () => import('@/views/candidates/CandidatesSelection.vue'),
+    component: () => import('@/views/candidates/selection/CandidatesSelection.vue'),
     meta: {
       requiresAuth: true,
       pageTitle: 'Prebecarios',
@@ -20,6 +20,20 @@ export default [
         {
           text: 'Selección',
           active: true,
+        },
+      ],
+    },
+  },
+  {
+    path: '/prebecario-detalles',
+    name: 'prebecario-detalles',
+    component: () => import('@/views/candidates/selection/CandidateSelectionDetails.vue'),
+    meta: {
+      requiresAuth: true,
+      pageTitle: 'Prebecarios',
+      breadcrumb: [
+        {
+          text: 'Detalles',
         },
       ],
     },

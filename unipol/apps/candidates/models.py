@@ -22,7 +22,7 @@ class Candidate(models.Model):
     height = models.IntegerField(help_text="Entry height")
     belongs_other_corporation = models.BooleanField(default=False)
 
-    date_crate = models.DateTimeField(default=timezone.now)
+    date_create = models.DateTimeField(default=timezone.now)
 
     class Meta:
         verbose_name = 'Candidate'
@@ -42,13 +42,13 @@ class Documents(models.Model):
     )
 
 
-    birth_certificate = models.FileField(upload_to='documents', max_length=100)
-    curp = models.FileField(upload_to='documents', max_length=100)
-    rfc = models.FileField(upload_to='documents', max_length=100)
-    ine = models.FileField(upload_to='documents', max_length=100)
-    proof_of_address = models.FileField(upload_to='documents', max_length=100)
-    proof_of_studies = models.FileField(upload_to=f'documents', max_length=100)
-    proof_of_courses = models.FileField(upload_to=f'documents', max_length=100, null=True, blank=True)
+    file_birth_certificate = models.FileField(upload_to='documents', max_length=100)
+    file_curp = models.FileField(upload_to='documents', max_length=100)
+    file_rfc = models.FileField(upload_to='documents', max_length=100)
+    file_ine = models.FileField(upload_to='documents', max_length=100)
+    file_proof_address = models.FileField(upload_to='documents', max_length=100)
+    file_proof_studies = models.FileField(upload_to=f'documents', max_length=100)
+    file_proof_courses = models.FileField(upload_to=f'documents', max_length=100, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Document'
@@ -67,8 +67,8 @@ class Contact(models.Model):
         on_delete=models.CASCADE
     )
 
-    telephone = models.CharField(max_length=10, help_text="Entry Telephone")
-    mobile_telephone = models.CharField(max_length=10, null=True, blank=True, help_text="Entry Mobile Telephone")
+    telephone = models.IntegerField(help_text="Entry Telephone")
+    mobile_telephone = models.IntegerField(null=True, blank=True, help_text="Entry Mobile Telephone")
     email = models.EmailField(help_text="Entry Email", unique=True)
 
     def __str__(self):
@@ -86,7 +86,8 @@ class Direction(models.Model):
     )
 
     place_of_residence = models.CharField(max_length=35)
-    delegacion = models.CharField(max_length=50)
+    delegation = models.CharField(max_length=50)
+    suburb = models.CharField(max_length=70)
     postal_code = models.IntegerField()
     street = models.CharField(max_length=50)
     num_outdoor = models.IntegerField()

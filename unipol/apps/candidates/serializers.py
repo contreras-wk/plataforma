@@ -55,8 +55,7 @@ class DocumentsSerializer(serializers.ModelSerializer):
 
 
 class CandidateDetailsSerializer(serializers.ModelSerializer):
-    
-    docuemts = DocumentsSerializer()
+    documents = DocumentsSerializer()
     contact = ContactSerializer()
     direction = DirectionSerializer()
     callinfo = CallInfoSerializer()

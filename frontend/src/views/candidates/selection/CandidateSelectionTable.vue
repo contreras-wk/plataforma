@@ -129,7 +129,7 @@
               align="right"
               prev-class="prev-item"
               next-class="next-item"
-              class="mt-1 mb-0"
+              class="mt-1 mb-0 pagination-success"
               @input="(value)=>props.pageChanged({currentPage:value})"
             >
               <template #prev-text>
@@ -165,7 +165,7 @@ import { VueGoodTable } from 'vue-good-table'
 import store from '@/store/index'
 
 import useJwt from '@/auth/jwt/useJwt'
-import { codeBasic } from './code'
+import { codeBasic } from '../code'
 
 export default {
   components: {

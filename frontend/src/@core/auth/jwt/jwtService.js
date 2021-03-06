@@ -115,7 +115,43 @@ export default class JwtService {
     })
   }
 
+  // getCandidates(...queryParams) {
+  //   return this.axiosIns.get(this.jwtConfig.candidates, { params: queryParams })
+  // }
   getCandidates() {
-    return this.axiosIns.get(this.jwtConfig.getCandidates)
+    return this.axiosIns.get(this.jwtConfig.candidates)
+  }
+
+  getCandidate(pk) {
+    console.log('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
+    console.log(`${this.jwtConfig.candidates}${pk}/`)
+    return this.axiosIns.get(`${this.jwtConfig.candidates}${pk}/`)
+  }
+
+  saveCandidate(...args) {
+    return this.axiosIns.post(this.jwtConfig.candidates, ...args)
+  }
+
+  saveCandidateStudies(...args) {
+    return this.axiosIns.post(this.jwtConfig.candidatesStudies, ...args)
+  }
+
+  saveCandidateDirection(...args) {
+    return this.axiosIns.post(this.jwtConfig.candidatesDirection, ...args)
+  }
+
+  saveCandidateContact(...args) {
+    return this.axiosIns.post(this.jwtConfig.candidatesContact, ...args)
+  }
+
+  saveCandidateDocuments(...args) {
+    const ok = axios.create({
+      baseURL: 'http://127.0.0.1:8000/api/v1.0/',
+      headers: {
+        Authorization: `${this.jwtConfig.tokenType} ${store.state.user.token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return ok.post(this.jwtConfig.candidatesDocuments, ...args)
   }
 }
