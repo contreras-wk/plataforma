@@ -5,11 +5,11 @@ import store from '@/store'
 import { useToast } from 'vue-toastification/composition'
 import ToastificationContent from '@core/components/toastification/ToastificationContent.vue'
 
-export default function useInvoicesList() {
+export default function useCandidateList() {
   // Use toast
   const toast = useToast()
 
-  const refInvoiceListTable = ref(null)
+  const refCandidateListTable = ref(null)
 
   // Table Handlers
   const tableColumns = [
@@ -34,17 +34,17 @@ export default function useInvoicesList() {
   //   { key: 'balance', sortable: true },
   //   { key: 'actions' },
   // ]
-  const perPage = ref(10)
+  const perPage = ref(20)
   const totalInvoices = ref(0)
   const currentPage = ref(1)
-  const perPageOptions = [10, 30, 50, 100]
+  const perPageOptions = [20, 50, 100]
   const searchQuery = ref('')
   const sortBy = ref('id')
   const isSortDirDesc = ref(true)
   const statusFilter = ref(null)
 
   const dataMeta = computed(() => {
-    const localItemsCount = refInvoiceListTable.value ? refInvoiceListTable.value.localItems.length : 0
+    const localItemsCount = refCandidateListTable.value ? refCandidateListTable.value.localItems.length : 0
     return {
       from: perPage.value * (currentPage.value - 1) + (localItemsCount ? 1 : 0),
       to: perPage.value * (currentPage.value - 1) + localItemsCount,
@@ -53,16 +53,16 @@ export default function useInvoicesList() {
   })
 
   const refetchData = () => {
-    refInvoiceListTable.value.refresh()
+    refCandidateListTable.value.refresh()
   }
 
   watch([currentPage, perPage, searchQuery, statusFilter], () => {
     refetchData()
   })
 
-  const fetchInvoices = (ctx, callback) => {
+  const fetchCandidates = (ctx, callback) => {
     store
-      .dispatch('app-invoice/fetchCandidates', {
+      .dispatch('app-prebecarios/fetchCandidates', {
         q: searchQuery.value,
         perPage: perPage.value,
         page: currentPage.value,
@@ -94,13 +94,13 @@ export default function useInvoicesList() {
   // *--------- UI ---------------------------------------*
   // *===============================================---*
 
-  const resolveInvoiceStatusVariantAndIcon = status => {
+  const resolveCandidateStatusVariantAndIcon = status => {
     if (status === 'Partial Payment') return { variant: 'warning', icon: 'PieChartIcon' }
     if (status === 'Paid') return { variant: 'success', icon: 'CheckCircleIcon' }
     if (status === 'Downloaded') return { variant: 'info', icon: 'ArrowDownCircleIcon' }
     if (status === 'Draft') return { variant: 'primary', icon: 'SaveIcon' }
-    if (status === 'Sent') return { variant: 'secondary', icon: 'SendIcon' }
-    if (status === 'Past Due') return { variant: 'danger', icon: 'InfoIcon' }
+    if (status === 'Aceptado') return { variant: 'secondary', icon: 'SendIcon' }
+    if (status === 'Rechazado') return { variant: 'danger', icon: 'InfoIcon' }
     return { variant: 'secondary', icon: 'XIcon' }
   }
 
@@ -114,8 +114,15 @@ export default function useInvoicesList() {
     return 'primary'
   }
 
+  const statusCandidateVaiant = status => {
+    if (status === 'RECHAZADO') return 'danger'
+    if (status === 'PENDIENTE') return 'warning'
+    if (status === 'ACEPTADO') return 'success'
+    return 'info'
+  }
+
   return {
-    fetchInvoices,
+    fetchCandidates,
     tableColumns,
     perPage,
     currentPage,
@@ -125,12 +132,13 @@ export default function useInvoicesList() {
     searchQuery,
     sortBy,
     isSortDirDesc,
-    refInvoiceListTable,
+    refCandidateListTable,
 
     statusFilter,
 
-    resolveInvoiceStatusVariantAndIcon,
+    resolveCandidateStatusVariantAndIcon,
     resolveClientAvatarVariant,
+    statusCandidateVaiant,
 
     refetchData,
   }

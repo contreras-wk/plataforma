@@ -7,18 +7,17 @@ export default {
   getters: {},
   mutations: {},
   actions: {
-    fetchCandidates(queryParams) {
+    fetchCandidates() {
+      // console.table(queryParams)
       return new Promise((resolve, reject) => {
-        console.log('>>>>>>>>>>>>>>>>>>>>>>')
-        console.log(queryParams)
-        useJwt.getCandidates(queryParams)
+        useJwt.getCandidates()
           .then(response => resolve(response))
           .catch(error => reject(error))
       })
     },
-    fetchCandidate() {
+    fetchCandidate(ctx, { key }) {
       return new Promise((resolve, reject) => {
-        useJwt.getCandidate(15)
+        useJwt.getCandidate(key)
           .then(response => resolve(response))
           .catch(error => reject(error))
       })

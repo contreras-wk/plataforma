@@ -13,8 +13,8 @@ from .api import (
 
 
 urlpatterns = [
-    path('scholars/', ScholarLC.as_view(), name='scholars'),
-    path('scholar/<int:pk>/', ScholarRUD.as_view(), name='scholar_details'),
+    path('', ScholarLC.as_view(), name='scholars'),
+    path('<int:pk>/', ScholarRUD.as_view(), name='scholar_details'),
 
     path('assistences/', AssistenceLC.as_view(), name='assistences'),
     path('assistence/<int:pk>/', AssistenceRUD.as_view(), name='assistence_details'),

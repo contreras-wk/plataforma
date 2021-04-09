@@ -123,9 +123,15 @@ export default class JwtService {
   }
 
   getCandidate(pk) {
-    console.log('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
-    console.log(`${this.jwtConfig.candidates}${pk}/`)
     return this.axiosIns.get(`${this.jwtConfig.candidates}${pk}/`)
+  }
+
+  getDocument(name) {
+    return this.axiosIns.get(`${this.jwtConfig.candidatesDocuments}${name}`)
+  }
+
+  updateCandidate(key, ...args) {
+    return this.axiosIns.put(`${this.jwtConfig.candidateUpdate}${key}/`, ...args)
   }
 
   saveCandidate(...args) {
@@ -153,5 +159,9 @@ export default class JwtService {
       },
     })
     return ok.post(this.jwtConfig.candidatesDocuments, ...args)
+  }
+
+  saveScholar(...args) {
+    return this.axiosIns.post(this.jwtConfig.scholar, ...args)
   }
 }

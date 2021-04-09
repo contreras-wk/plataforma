@@ -4,9 +4,16 @@ from django.utils import timezone
 
 class Candidate(models.Model):
 
-    GENDER = (
+    GENDER_CHOICES= (
         ('M', 'Masculino'),
         ('F', 'Femenino'),
+    )
+
+    STATUS_CHOICES = (
+        ('SIN REVISAR', 'SIN REVISAR'),
+        ('PENDIENTE', 'PENDIENTE'),
+        ('RECHAZADO', 'RECHAZADO'),
+        ('ACEPTADO', 'ACEPTADO'),
     )
     
     curp = models.CharField(max_length=19, help_text="Entry CURP", unique=True)
@@ -16,13 +23,16 @@ class Candidate(models.Model):
     last_name = models.CharField(max_length=50, help_text="Entry last name")
     mothers_last_name = models.CharField(max_length=50, help_text="Entry mothers last name")
 
-    gender = models.CharField(max_length=1, choices=GENDER, help_text="Entry gender")
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, help_text="Entry gender")
 
     age = models.IntegerField(help_text="Entry age")
     height = models.IntegerField(help_text="Entry height")
     belongs_other_corporation = models.BooleanField(default=False)
 
     date_create = models.DateTimeField(default=timezone.now)
+
+    status =  models.CharField(max_length=15, choices=STATUS_CHOICES, default='SIN_REVISAR')
+    details = models.CharField(max_length=200, default='', blank=True)
 
     class Meta:
         verbose_name = 'Candidate'
@@ -139,4 +149,16 @@ class Studies(models.Model):
         return f'{self.candidate.curp}'
 
 
+# class Status(models.Model):
 
+#     STATUS_CHOICES = (
+#         ('PENDIENTE', 'PENDIENTE'),
+#         ('RECHAZADO', 'RECHAZADO'),
+#         ('ACEPTADO', 'ACEPTADO'),
+#     )
+
+#     status = models.CharField(max_length=15, default='SIN_REVISAR')
+#     details = models.CharField(max_length=200)
+
+#     def __str__(self):
+#         return f'self.status'

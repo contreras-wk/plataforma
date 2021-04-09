@@ -4,13 +4,16 @@ from django.conf.urls.static import static
 from unipol.settings import local
 
 from .api import *
+from .views import view_pdf
 
 urlpatterns = [
     path('', CandidateLC.as_view(), name='candidates'),
     path('<int:pk>/', CandidateDetails.as_view(), name='candidate'),
+    path('update/<int:pk>/', CandidateRUD.as_view(), name='candidate'),
 
     path('document/', DocumentsC.as_view(), name='document'),
-    path('document/<int:pk>/', DocumentsRU.as_view(), name='document'),
+    path('document/<str:document>/', GetDocument.as_view(), name='document'),
+    # path('document/<str:document>/', view_pdf),
 
     path('contact/', ContactC.as_view(), name='contact'),
     path('contact/<int:pk>/', ContactRU.as_view(), name='contact'),

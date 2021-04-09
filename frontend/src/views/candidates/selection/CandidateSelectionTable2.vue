@@ -26,7 +26,7 @@
           />
           <b-button
             variant="success"
-            :to="{ name: 'apps-invoice-add'}"
+            :to="{ name: ''}"
           >
             Add Record
           </b-button>
@@ -62,8 +62,8 @@
     </div>
 
     <b-table
-      ref="refInvoiceListTable"
-      :items="fetchInvoices"
+      ref="refCandidateListTable"
+      :items="fetchCandidates"
       responsive
       :fields="tableColumns"
       primary-key="id"
@@ -84,10 +84,10 @@
       <!-- Column: Id -->
       <template #cell(id)="data">
         <b-link
-          :to="{ name: 'apps-invoice-preview', params: { id: data.item.id }}"
+          :to="{ name: 'prebecario-detalles', params: { id: data.item.id }}"
           class="font-weight-bold"
         >
-          #{{ data.value }}
+          #{{ data.item.id }}
         </b-link>
       </template>
 
@@ -96,10 +96,10 @@
         <b-avatar
           :id="`invoice-row-${data.item.id}`"
           size="32"
-          :variant="`light-${resolveInvoiceStatusVariantAndIcon(data.item.invoiceStatus).variant}`"
+          :variant="`light-${resolveCandidateStatusVariantAndIcon(data.item.invoiceStatus).variant}`"
         >
           <feather-icon
-            :icon="resolveInvoiceStatusVariantAndIcon(data.item.invoiceStatus).icon"
+            :icon="resolveCandidateStatusVariantAndIcon(data.item.invoiceStatus).icon"
           />
         </b-avatar>
         <b-tooltip
@@ -144,18 +144,13 @@
       </template>
 
       <!-- Column: Balance -->
-      <template #cell(balance)="data">
-        <template v-if="data.value === 0">
-          <b-badge
-            pill
-            variant="light-success"
-          >
-            Paid
-          </b-badge>
-        </template>
-        <template v-else>
+      <template #cell(status)="data">
+        <b-badge
+          pill
+          :variant="`light-${statusCandidateVaiant(data.value)}`"
+        >
           {{ data.value }}
-        </template>
+        </b-badge>
       </template>
 
       <!-- Column: Actions -->
@@ -169,7 +164,7 @@
             size="16"
           />
           <b-tooltip
-            title="Send Invoice"
+            title="Notificar"
             class="cursor-pointer"
             :target="`invoice-row-${data.item.id}-send-icon`"
           />
@@ -182,18 +177,17 @@
             @click="$router.push({ name: 'prebecario-detalles', params: { id: data.item.id }})"
           />
           <b-tooltip
-            title="Preview Invoice"
+            title="Detalles Prebecario"
             :target="`invoice-row-${data.item.id}-preview-icon`"
           />
 
           <!-- Dropdown -->
-          <b-dropdown
+          <!-- <b-dropdown
             variant="link"
             toggle-class="p-0"
             no-caret
             :right="$store.state.appConfig.isRTL"
           >
-
             <template #button-content>
               <feather-icon
                 icon="MoreVerticalIcon"
@@ -205,7 +199,7 @@
               <feather-icon icon="DownloadIcon" />
               <span class="align-middle ml-50">Download</span>
             </b-dropdown-item>
-            <b-dropdown-item :to="{ name: 'apps-invoice-edit', params: { id: data.item.id } }">
+            <b-dropdown-item :to="{ name: '', params: { id: data.item.id } }">
               <feather-icon icon="EditIcon" />
               <span class="align-middle ml-50">Edit</span>
             </b-dropdown-item>
@@ -217,14 +211,13 @@
               <feather-icon icon="CopyIcon" />
               <span class="align-middle ml-50">Duplicate</span>
             </b-dropdown-item>
-          </b-dropdown>
+          </b-dropdown> -->
         </div>
       </template>
 
     </b-table>
     <div class="mx-2 mb-2">
       <b-row>
-
         <b-col
           cols="12"
           sm="6"
@@ -233,6 +226,7 @@
           <!-- <span class="text-muted">Showing {{ dataMeta.from }} to {{ dataMeta.to }} of {{ dataMeta.of }} entries</span> -->
           <span class="text-muted">Mostrando {{ dataMeta.from }} to {{ dataMeta.to }} de {{ dataMeta.of }} registros</span>
         </b-col>
+
         <!-- Pagination -->
         <b-col
           cols="12"
@@ -247,8 +241,8 @@
             first-number
             last-number
             class="mb-0 mt-1 mt-sm-0 pagination-success"
-            prev-class="prev-item"
-            next-class="next-item"
+            prev-class="prev-item-success"
+            next-class="next-item-success"
           >
             <template #prev-text>
               <feather-icon
@@ -276,14 +270,14 @@
 <script>
 import {
   BCard, BRow, BCol, BFormInput, BButton, BTable, BMedia, BAvatar, BLink,
-  BBadge, BDropdown, BDropdownItem, BPagination, BTooltip,
+  BBadge, BPagination, BTooltip, // BDropdown,  BDropdownItem,
 } from 'bootstrap-vue'
 import { avatarText } from '@core/utils/filter'
 import vSelect from 'vue-select'
 import { onUnmounted } from '@vue/composition-api'
 import store from '@/store'
-import useInvoicesList from './useInvoiceList'
 
+import useCandidateList from './useCandidateList'
 import invoiceStoreModule from './invoiceStoreModule'
 
 export default {
@@ -298,34 +292,33 @@ export default {
     BAvatar,
     BLink,
     BBadge,
-    BDropdown,
-    BDropdownItem,
+    // BDropdown,
+    // BDropdownItem,
     BPagination,
     BTooltip,
 
     vSelect,
   },
   setup() {
-    const INVOICE_APP_STORE_MODULE_NAME = 'app-invoice'
+    const PREBECARIOS_APP_STORE_MODULE_NAME = 'app-prebecarios'
 
     // Register module
-    if (!store.hasModule(INVOICE_APP_STORE_MODULE_NAME)) store.registerModule(INVOICE_APP_STORE_MODULE_NAME, invoiceStoreModule)
+    if (!store.hasModule(PREBECARIOS_APP_STORE_MODULE_NAME)) store.registerModule(PREBECARIOS_APP_STORE_MODULE_NAME, invoiceStoreModule)
 
     // UnRegister on leave
     onUnmounted(() => {
-      if (store.hasModule(INVOICE_APP_STORE_MODULE_NAME)) store.unregisterModule(INVOICE_APP_STORE_MODULE_NAME)
+      if (store.hasModule(PREBECARIOS_APP_STORE_MODULE_NAME)) store.unregisterModule(PREBECARIOS_APP_STORE_MODULE_NAME)
     })
 
     const statusOptions = [
-      'Downloaded',
-      'Draft',
-      'Paid',
-      'Partial Payment',
-      'Past Due',
+      'SIN_REVISAR',
+      'Pendiente',
+      'Aceptado',
+      'Rechazado',
     ]
 
     const {
-      fetchInvoices,
+      fetchCandidates,
       tableColumns,
       perPage,
       currentPage,
@@ -335,18 +328,19 @@ export default {
       searchQuery,
       sortBy,
       isSortDirDesc,
-      refInvoiceListTable,
+      refCandidateListTable,
 
       statusFilter,
 
       refetchData,
 
-      resolveInvoiceStatusVariantAndIcon,
+      resolveCandidateStatusVariantAndIcon,
       resolveClientAvatarVariant,
-    } = useInvoicesList()
+      statusCandidateVaiant,
+    } = useCandidateList()
 
     return {
-      fetchInvoices,
+      fetchCandidates,
       tableColumns,
       perPage,
       currentPage,
@@ -356,7 +350,7 @@ export default {
       searchQuery,
       sortBy,
       isSortDirDesc,
-      refInvoiceListTable,
+      refCandidateListTable,
 
       statusFilter,
 
@@ -365,8 +359,9 @@ export default {
       statusOptions,
 
       avatarText,
-      resolveInvoiceStatusVariantAndIcon,
+      resolveCandidateStatusVariantAndIcon,
       resolveClientAvatarVariant,
+      statusCandidateVaiant,
     }
   },
 }

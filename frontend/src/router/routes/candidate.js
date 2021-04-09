@@ -38,4 +38,14 @@ export default [
       ],
     },
   },
+  {
+    path: '/prebecario-documento',
+    name: 'prebecario-documento',
+    props: true,
+    component: () => import('@/views/candidates/selection/CandidateDocument.vue'),
+    meta: {
+      requiresAuth: false,
+      layout: 'full',
+    },
+  },
 ]

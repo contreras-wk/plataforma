@@ -54,7 +54,7 @@ export default [
   },
   {
     title: 'Second Page',
-    route: 'second-page',
+    // route: 'second-page',
     icon: 'FileIcon',
   },
 ]

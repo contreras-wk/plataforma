@@ -1,7 +1,7 @@
 <template>
   <section class="invoice-preview-wrapper">
 
-    <!-- Alert: No item found -->
+    <!-- Alerta, no hay carga de datos -->
     <b-alert
       variant="danger"
       :show="candidateData === undefined"
@@ -13,7 +13,7 @@
         No invoice found with this invoice id. Check
         <b-link
           class="alert-link"
-          :to="{ name: 'apps-invoice-list'}"
+          :to="{ name: 'prebecarios-seleccion'}"
         >
           Invoice List
         </b-link>
@@ -66,282 +66,244 @@
                     {{ candidateData.date_create }}
                   </p>
                 </div>
-                <b-col>
-
-                </b-col>
               </div>
             </div>
           </b-card-body>
 
-          <!-- Spacer -->
-          <b-alert
-          variant="secondary"
-          show
-          class="mb-0"
-        >
-          <h5 class="alert-body">
-            Datos Personales
-          </h5>
-        </b-alert>
-          <!-- <hr class="invoice-spacing"> -->
-
-          <!-- Invoice Client & Payment Details -->
-          <b-card-body
-            v-if="candidateData"
-            class="invoice-padding pt-0"
-          >
-            <b-row class="invoice-spacing">
-
-              <!-- Col: Invoice To -->
-              <b-col
-                cols="12"
-                xl="6"
-                class="p-0"
-              >
-                <h6 class="mb-0">
-                  CURP:
-                </h6>
-                <p class="card-text mb-25">
-                  {{ candidateData.curp }}
-                </p>
-                <h6 class="card-text mb-0">
-                  RFC:
-                </h6>
-                <p class="card-text mb-10">
-                  {{ candidateData.rfc }}
-                </p>
-              </b-col>
-
-              <!-- Col: Payment Details -->
-              <b-col
-                xl="6"
-                cols="12"
-                class="p-0 mt-xl-0 mt-2 d-flex justify-content-xl-end"
-              >
-                <div>
-                  <table>
-                    <tbody>
-                      <tr calss="mb-1">
-                        <td class="mb-1 pr-1">
-                          Edad:
-                        </td>
-                        <td><span class="font-weight-bold">{{ candidateData.age }}</span></td>
-                      </tr>
-                      <tr>
-                        <td class="pr-1">
-                          Estatura:
-                        </td>
-                        <td><span class="font-weight-bold">{{ candidateData.height }} [cm]</span></td>
-                      </tr>
-                      <tr>
-                        <td class="pr-1">
-                          Genéro:
-                        </td>
-                        <td><span class="font-weight-bold" >{{ candidateData.gender }}</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </b-col>
-            </b-row>
-          </b-card-body>
-
-          <!-- Nivel de Studios -->
-          <b-alert
-            variant="secondary"
-            show
-            class="mb-0"
-          >
-            <h5 class="alert-body">
-              Estudios
-            </h5>
-          </b-alert>
-
-          <b-row class="invoice-spacing">
-            <b-col
-                xl="6"
-                cols="12"
-                class="p-0 mt-xl-0 mt-2 d-flex justify-content-xl-end"
-              >
-                <div>
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td class="pr-1">
-                          Nivel de estudios:
-                        </td>
-                        <td><span class="font-weight-bold">{{ candidateData.studies.level_of_studies }}</span></td>
-                      </tr>
-                      <tr>
-                        <td class="pr-1">
-                          Detalles:
-                        </td>
-                        <td><span class="font-weight-bold">{{ candidateData.studies.details }}</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </b-col>
-          </b-row>
-
-          <!-- Dirección -->
-          <b-alert
-            variant="secondary"
-            show
-            class="mb-0"
-          >
-            <h5 class="alert-body">
-              Dirección
-            </h5>
-          </b-alert>
-
-          <b-row class="invoice-spacing">
-            <b-col
-                xl="6"
-                cols="12"
-                class="p-0 mt-xl-0 mt-2 d-flex justify-content-xl-end"
-              >
-                <div>
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td class="pr-1">
-                          Ligar de residencia:
-                        </td>
-                        <td><span class="font-weight-bold">{{ candidateData.direction.place_of_residence }}</span></td>
-                      </tr>
-                      <tr>
-                        <td class="pr-1">
-                          Delegación o Municipio:
-                        </td>
-                        <td><span class="font-weight-bold">{{ candidateData.direction.delegation }}</span></td>
-                      </tr>
-                      <tr>
-                        <td class="pr-1">
-                          Colonia:
-                        </td>
-                        <td><span class="font-weight-bold" >{{ candidateData.direction.suburb }}</span></td>
-                      </tr>
-                      <tr>
-                        <td class="pr-1">
-                          Código Postal:
-                        </td>
-                        <td><span class="font-weight-bold" >{{ candidateData.direction.postal_code }}</span></td>
-                      </tr>
-                      <tr>
-                        <td class="pr-1">
-                          Calle:
-                        </td>
-                        <td><span class="font-weight-bold" >{{ candidateData.direction.street }}</span></td>
-                      </tr>
-                      <tr>
-                        <td class="pr-1">
-                          Número Exterior:
-                        </td>
-                        <td><span class="font-weight-bold" >{{ candidateData.direction.num_outdoor }}</span></td>
-                      </tr>
-                      <tr>
-                        <td class="pr-1">
-                          Número Interior:
-                        </td>
-                        <td><span class="font-weight-bold" >{{ candidateData.direction.num_inside }}</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </b-col>
-          </b-row>
-
-          <!-- Invoice Description: Table -->
-          <b-table-lite
-            responsive
-            :items="invoiceDescription"
-            :fields="['taskDescription', 'rate', 'hours', 'total']"
-          >
-            <template #cell(taskDescription)="data">
-              <b-card-text class="font-weight-bold mb-25">
-                {{ data.item.taskTitle }}
-              </b-card-text>
-              <b-card-text class="text-nowrap">
-                {{ data.item.taskDescription }}
-              </b-card-text>
-            </template>
-          </b-table-lite>
-
-          <!-- Invoice Description: Total -->
-          <b-card-body class="invoice-padding pb-0">
-            <b-row>
-
-              <!-- Col: Sales Persion -->
-              <b-col
-                cols="12"
-                md="6"
-                class="mt-md-0 mt-3"
-                order="2"
-                order-md="1"
-              >
-                <b-card-text class="mb-0">
-                  <span class="font-weight-bold">Salesperson:</span>
-                  <span class="ml-75">Alfie Solomons</span>
-                </b-card-text>
-              </b-col>
-
-              <!-- Col: Total -->
-              <b-col
-                cols="12"
-                md="6"
-                class="mt-md-6 d-flex justify-content-end"
-                order="1"
-                order-md="2"
-              >
-                <div class="invoice-total-wrapper">
-                  <div class="invoice-total-item">
-                    <p class="invoice-total-title">
-                      Subtotal:
-                    </p>
-                    <p class="invoice-total-amount">
-                      $1800
-                    </p>
-                  </div>
-                  <div class="invoice-total-item">
-                    <p class="invoice-total-title">
-                      Discount:
-                    </p>
-                    <p class="invoice-total-amount">
-                      $28
-                    </p>
-                  </div>
-                  <div class="invoice-total-item">
-                    <p class="invoice-total-title">
-                      Tax:
-                    </p>
-                    <p class="invoice-total-amount">
-                      21%
-                    </p>
-                  </div>
-                  <hr class="my-50">
-                  <div class="invoice-total-item">
-                    <p class="invoice-total-title">
-                      Total:
-                    </p>
-                    <p class="invoice-total-amount">
-                      $1690
-                    </p>
-                  </div>
-                </div>
-              </b-col>
-            </b-row>
-          </b-card-body>
-
-          <!-- Spacer -->
           <hr class="invoice-spacing">
 
-          <!-- Note -->
-          <b-card-body class="invoice-padding pt-0">
-            <span class="font-weight-bold">Note: </span>
-            <span>It was a pleasure working with you and your team. We hope you will keep us in mind for future freelance
-              projects. Thank You!</span>
-          </b-card-body>
+          <!-- Datos Personales -->
+          <b-row>
+            <b-col cols="3">
+              <h5 class="alert-body ml-4">
+                Datos Personales
+              </h5>
+            </b-col>
+            <b-col
+              xl="6"
+              cols="4"
+              class="p-0 mt-xl-0 mt-2 justify-content-xl-end"
+            >
+              <div>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td class="pr-1">
+                        CURP
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.curp }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        RFC:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.rfc }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Edad:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.age }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Estatura:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.height }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Genero:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.gender }}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </b-col>
+            <b-col
+              align-self="center"
+              cols="3"
+            >
+              <b-button
+                class="mb-1"
+                variant="outline-success"
+                @click="showCurp"
+              >Ver CURP</b-button>
+              <b-button
+                class="mb-1 ml-1"
+                variant="success"
+              >Ver RFC</b-button>
+              <b-button
+                variant="success"
+              >Ver ActaN</b-button>
+              <b-button
+                class="ml-1"
+                variant="success"
+              >Ver INE</b-button>
+            </b-col>
+          </b-row>
+
+          <hr class="invoice-spacing">
+
+          <!-- Nivel de estudios -->
+          <b-row>
+            <b-col cols="3">
+              <h5 class="alert-body ml-4 mb-0">
+                Estudios
+              </h5>
+            </b-col>
+            <b-col
+              xl="6"
+              cols="6"
+              class="p-0 mt-xl-0 mt-2 justify-content-xl-end"
+            >
+              <div>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td class="">
+                        Nivel de estudios:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.studies.level_of_studies }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Detalles:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.studies.details }}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </b-col>
+            <b-col
+              align-self="center"
+              cols="3"
+            >
+              <b-button
+                class="m-1"
+                variant="outline-success"
+              >Ver comprobante de estudios</b-button>
+            </b-col>
+          </b-row>
+
+          <hr class="invoice-spacing">
+
+          <!-- Dirección -->
+          <b-row>
+            <b-col cols="3">
+              <h5 class="alert-body ml-4 my-0">
+                Dirección
+              </h5>
+            </b-col>
+            <b-col
+              xl="6"
+              cols="6"
+              class="p-0 mt-xl-0 mt-2 justify-content-xl-end"
+            >
+              <div>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td class="pr-1">
+                        Lugar de residencia:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.direction.place_of_residence }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Delegación o Municipio:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.direction.delegation }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Colonia:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.direction.suburb }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Código Postal:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.direction.postal_code }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Calle:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.direction.street }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Número Exterior:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.direction.num_outdoor }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Número Interior:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.direction.num_inside }}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </b-col>
+            <b-col
+              align-self="center"
+              cols="3"
+            >
+              <b-button
+                class="m-1"
+                variant="outline-success"
+              >Ver comprobante de domicilio</b-button>
+            </b-col>
+          </b-row>
+
+          <hr class="invoice-spacing">
+
+          <!-- Contacto -->
+          <b-row>
+            <b-col cols="3">
+              <h5 class="alert-body ml-4">
+                Contacto
+              </h5>
+            </b-col>
+            <b-col
+              xl="6"
+              cols="6"
+              class="p-0 mt-xl-0 mt-2 justify-content-xl-end"
+            >
+              <div>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td class="pr-1">
+                        Telefono:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.contact.telephone }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Telefono Móvil:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.contact.mobile_telephone }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="pr-1">
+                        Correo Electronico:
+                      </td>
+                      <td><span class="font-weight-bold">{{ candidateData.contact.email }}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </b-col>
+          </b-row>
+
+          <hr class="invoice-spacing">
         </b-card>
       </b-col>
 
@@ -355,7 +317,7 @@
         <b-card>
 
           <!-- Button: Send Invoice -->
-          <b-button
+          <!-- <b-button
             v-ripple.400="'rgba(255, 255, 255, 0.15)'"
             v-b-toggle.sidebar-send-invoice
             variant="primary"
@@ -363,22 +325,11 @@
             block
           >
             Send Invoice
-          </b-button>
-
-          <!-- Button: DOwnload -->
-          <b-button
-            v-ripple.400="'rgba(186, 191, 199, 0.15)'"
-            variant="outline-secondary"
-            class="mb-75"
-            block
-          >
-            Download
-          </b-button>
-
+          </b-button> -->
           <!-- Button: Print -->
           <b-button
             v-ripple.400="'rgba(186, 191, 199, 0.15)'"
-            variant="outline-secondary"
+            variant="outline-success"
             class="mb-75"
             block
             @click="printInvoice"
@@ -386,26 +337,57 @@
             Imprimir
           </b-button>
 
-          <!-- Button: Edit -->
+          <!-- Button: Rechazar -->
           <b-button
             v-ripple.400="'rgba(186, 191, 199, 0.15)'"
-            variant="outline-secondary"
+            variant="outline-danger"
             class="mb-75"
             block
-            :to="{ name: 'apps-invoice-edit', params: { id: $route.params.id } }"
+            @click="deniesCandidate"
+          >
+            Rechazar
+          </b-button>
+
+          <!-- Button: Pendiente -->
+          <!-- :to="{ name: '', params: { id: $route.params.id } }" -->
+          <b-button
+            v-ripple.400="'rgba(186, 191, 199, 0.15)'"
+            variant="outline-warning"
+            class="mb-75"
+            block
+            @click="show"
           >
             Pendiente
           </b-button>
 
           <!-- Button: Add Payment -->
+          <!-- v-b-toggle.sidebar-invoice-add-payment -->
           <b-button
-            v-b-toggle.sidebar-invoice-add-payment
             v-ripple.400="'rgba(255, 255, 255, 0.15)'"
             variant="success"
             class="mb-75"
             block
+            @click="addScholar"
           >
             Aceptar
+          </b-button>
+          <div>
+            <b-form-textarea
+              v-if="showDetails"
+              rows="10"
+              placeholder="Ingresa el motivo"
+              v-model="details"
+            >Small:</b-form-textarea>
+          </div>
+          <b-button
+            v-if="showDetails"
+            v-ripple.400="'rgba(186, 191, 199, 0.15)'"
+            variant="info"
+            class="my-75"
+            block
+            @click="earringCandidate"
+          >
+            Guardar
           </b-button>
         </b-card>
       </b-col>
@@ -421,11 +403,13 @@ import { ref, onUnmounted } from '@vue/composition-api'
 import store from '@/store'
 import router from '@/router'
 import {
-  BRow, BCol, BCard, BCardBody, BTableLite, BCardText, BButton, BAlert, BLink, VBToggle,
+  BRow, BCol, BCard, BCardBody, BButton, BAlert, BLink, VBToggle, BFormTextarea,
 } from 'bootstrap-vue'
 import Logo from '@core/layouts/components/Logo.vue'
 import Ripple from 'vue-ripple-directive'
+import useJwt from '@/auth/jwt/useJwt'
 import invoiceStoreModule from './invoiceStoreModule'
+
 // import InvoiceSidebarSendInvoice from './InvoiceSidebarSendInvoice.vue'
 // import InvoiceSidebarAddPayment from './InvoiceSidebarAddPayment.vue'
 
@@ -439,21 +423,16 @@ export default {
     BCol,
     BCard,
     BCardBody,
-    BTableLite,
-    BCardText,
     BButton,
     BAlert,
     BLink,
+    BFormTextarea,
 
     Logo,
     // InvoiceSidebarAddPayment,
     // InvoiceSidebarSendInvoice,
   },
-  data: () => ({
-    gender: '',
-  }),
   setup() {
-    console.log('ENTRO AL SETUP')
     const candidateData = ref(null)
     const paymentDetails = ref({})
 
@@ -476,7 +455,7 @@ export default {
       },
     ]
 
-    const INVOICE_APP_STORE_MODULE_NAME = 'app-invoice'
+    const INVOICE_APP_STORE_MODULE_NAME = 'app-candidate'
 
     // Register module
     if (!store.hasModule(INVOICE_APP_STORE_MODULE_NAME)) store.registerModule(INVOICE_APP_STORE_MODULE_NAME, invoiceStoreModule)
@@ -485,24 +464,18 @@ export default {
     onUnmounted(() => {
       if (store.hasModule(INVOICE_APP_STORE_MODULE_NAME)) store.unregisterModule(INVOICE_APP_STORE_MODULE_NAME)
     })
-    console.log('zzzzzzzzzzzzzzzzzz')
-    console.log(router.currentRoute.params.id)
-    store.dispatch('app-invoice/fetchCandidate', { id: router.currentRoute.params.id })
+    const parametro = router.currentRoute.params
+    const { id } = parametro
+    store.dispatch('app-candidate/fetchCandidate', { key: id })
       .then(response => {
-        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-        console.log(response)
         candidateData.value = response.data
-        // paymentDetails.value = response.data.paymentDetails
-        console.log('///////////////////////////////////////////////')
-        console.log(candidateData)
+        console.table(candidateData.documents)
       })
       .catch(error => {
         if (error.response.status === 404) {
           console.log('error 404')
           candidateData.value = undefined
         }
-        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-        console.log(error)
       })
 
     const printInvoice = () => {
@@ -515,6 +488,78 @@ export default {
       invoiceDescription,
       printInvoice,
     }
+  },
+  data: () => ({
+    showDetails: false,
+    details: '',
+  }),
+  methods: {
+    show() {
+      this.showDetails = !this.showDetails
+    },
+    updateStatusData(newStatus, newDetails) {
+      const dataUpdate = {
+        id: this.candidateData.id,
+        curp: this.candidateData.curp,
+        rfc: this.candidateData.rfc,
+        name: this.candidateData.name,
+        last_name: this.candidateData.last_name,
+        mothers_last_name: this.candidateData.mothers_last_name,
+        gender: this.candidateData.gender,
+        age: this.candidateData.age,
+        height: this.candidateData.height,
+        belongs_other_corporation: this.candidateData.belongs_other_corporation,
+        date_create: this.candidateData.date_create,
+        status: newStatus,
+        details: newDetails,
+      }
+      return dataUpdate
+    },
+    updateStatusCandidate(status, details = '') {
+      const data = this.updateStatusData(status, details)
+      useJwt.updateCandidate(this.$route.params.id, data)
+        .then(() => {
+          console.log('Datos actualizados')
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+    addScholar() {
+      console.log('Aceptado')
+      useJwt.saveScholar({ candidate: this.$route.params.id })
+        .then(() => {
+          console.log('Prebecario Aceptado')
+          const data = this.updateStatusCandidate('ACEPTADO')
+          console.table(data)
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+    deniesCandidate() {
+      this.updateStatusCandidate('RECHAZADO')
+    },
+    earringCandidate() {
+      if (this.details !== '') {
+        this.updateStatusCandidate('PENDIENTE', this.details)
+      }
+    },
+    showCurp() {
+      console.log(this.candidateData.documents.file_curp.split('/')[5])
+      const fileName = this.candidateData.documents.file_curp.split('/')[5]
+      useJwt.getDocument(fileName)
+        .then(response => {
+          // console.log('------ Visualizacion del documento')
+          console.table(response)
+          const blob = new Blob([response.data], { type: 'application/pdf' })
+          const url = URL.createObjectURL(blob)
+          window.open(url, 'Documnet', 'width=700,height=900')
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
   },
 }
 </script>
